@@ -17,26 +17,26 @@ class StudyCourse {
      *
      * @param $fk_ids
      * @param array $abschluss_ids
-     * @param array $studiengang_ids
+     * @param array $fach_ids
      */
-    public function __construct($fk_ids = [], $abschluss_ids = [], $studiengang_ids = [])
+    public function __construct($fk_ids = [], $abschluss_ids = [], $fach_ids = [])
     {
         $fk_ids = (empty($fk_ids))? [1, 2, 3, 4, 5, 6] : $fk_ids;
         $fk_ids = array_map(function ($val) { return 'x000000000000000000000000000000' . intval($val); } , $fk_ids);
         $values = [$fk_ids];
         $query = "SELECT COUNT(*) as count, fk_id, fach_id, abschluss_id, abschluss.name AS abschluss_name,
-                  studiengaenge.name AS fach_name
+                  fach.name AS fach_name
                   FROM mod_zuordnung INNER JOIN abschluss using (abschluss_Id)
-                  INNER JOIN studiengaenge ON fach_id = studiengang_id WHERE fk_id IN (?)";
+                  INNER JOIN fach USING(fach_id) WHERE fk_id IN (?)";
         if(!empty($abschluss_ids)) {
             $query .= " AND abschluss_id IN (?)";
             $values[] = $abschluss_ids;
         }
-        if(!empty($studiengang_ids)) {
+        if(!empty($fach_ids)) {
             $query .= " AND fach_id IN (?)";
-            $values[] = $studiengang_ids;
+            $values[] = $fach_ids;
         }
-        $query .= " GROUP BY fach_id, abschluss_id ORDER BY studiengaenge.name, abschluss.name;";
+        $query .= " GROUP BY fach_id, abschluss_id ORDER BY fach.name, abschluss.name;";
         $statement = DBManager::get()->prepare($query);
         $statement->execute($values);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -83,7 +83,7 @@ class StudyCourse {
     /**
      * @return array
      */
-    public function getStudiengangIDs()
+    public function getFachIDs()
     {
         $ids = array();
         foreach($this->study_courses as $study_course) {
@@ -115,9 +115,9 @@ class StudyCourse {
     {
         foreach($this->study_courses as $row) {
             $abschluesse[$row['abschluss_id']] = $row['abschluss_name'];
-            $studiengaenge[$row['fach_id']] = $row['fach_name'];
+            $faecher[$row['fach_id']] = $row['fach_name'];
         }
-        return compact("abschluesse", "studiengaenge");
+        return compact("abschluesse", "faecher");
     }
 
     /**

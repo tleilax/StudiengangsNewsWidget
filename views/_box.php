@@ -1,7 +1,7 @@
 <? if($path == 'abschluss'): ?>
-    <select id="studiengaenge" name="studiengaenge[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.count(this)" data-counter-url="<?= $controller->url_for('count_users') ?>">
-        <? foreach($studiengaenge as $id => $name): ?>
-            <option value="<?= $id ?>" <?= in_array($id, $selected_studiengaenge) ? 'selected="selected"' : '' ?>><?= $name ?></option>
+    <select id="faecher" name="faecher[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.count(this)" data-counter-url="<?= $controller->url_for('count_users') ?>">
+        <? foreach($faecher as $id => $name): ?>
+            <option value="<?= $id ?>" <?= in_array($id, $selected_faecher) ? 'selected="selected"' : '' ?>><?= $name ?></option>
         <? endforeach; ?>
     </select>
 <? else: ?>

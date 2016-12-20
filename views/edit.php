@@ -9,13 +9,13 @@
     <select id="path" name="path" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
         <option value="-">--- <?= _('Bitte wählen') ?>--- </option>
         <option value="abschluss"" <?= ($path == 'abschluss') ? 'selected="selected"' : '' ?>><?= _('Abschluss') ?></option>
-        <option value="studiengang"" <?= ($path == 'studiengang') ? 'selected="selected"' : '' ?>><?= _('Studiengang') ?></option>
+        <option value="fach" <?= ($path == 'fach') ? 'selected="selected"' : '' ?>><?= _('Fach') ?></option>
     </select>
     <br/>
     <div id="path_table">
         <? if(!$entry->isNew()): ?>
             <? $fk_ids = substr($entry->fk_id, -1); ?>
-            <?= $this->render_partial('_table.php', compact("path", "entry", "fk_ids", "selected_abschluesse", "selected_studiengaenge", "abschluesse", "studiengaenge")) ?>
+            <?= $this->render_partial('_table.php', compact("path", "entry", "fk_ids", "selected_abschluesse", "selected_faecher", "abschluesse", "faecher")) ?>
         <? endif; ?>
     </div>
     <br/>

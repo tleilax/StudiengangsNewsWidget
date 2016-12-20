@@ -1,4 +1,4 @@
-<? if(($path != 'abschluss' && $path != 'studiengang') || intval($fk_ids) == 0): ?>
+<? if(($path != 'abschluss' && $path != 'fach') || intval($fk_ids) == 0): ?>
     <b><?= _('Bitte treffen Sie eine Auswahl') ?></b>
 <? else: ?>
 <table class="default" width="100%">
@@ -9,9 +9,9 @@
     </colgroup>
     <thead>
         <tr>
-            <th><b>1. <?= ($path == 'abschluss')? _('Abschluss') : _('Studiengang') ?></b></th>
+            <th><b>1. <?= ($path == 'abschluss')? _('Abschluss') : _('fach') ?></b></th>
             <th></th>
-            <th><b>2. <?= ($path == 'abschluss')? _('Studiengang') : _('Abschluss') ?></b></th>
+            <th><b>2. <?= ($path == 'abschluss')? _('fach') : _('Abschluss') ?></b></th>
         </tr>
     </thead>
     <tbody>
@@ -19,15 +19,15 @@
             <td>
                 <div id="step_1">
                 <? if($path == 'abschluss'): ?>
-                    <select id="abschluesse" name="abschluesse[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.getStudiengaenge(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" data-update-url="<?= $controller->url_for('get_studiengaenge') ?>">
+                    <select id="abschluesse" name="abschluesse[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.getFaecher(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" data-update-url="<?= $controller->url_for('get_faecher') ?>">
                         <? foreach($abschluesse as $id => $name): ?>
                             <option value="<?= $id ?>" <?= in_array($id, $selected_abschluesse) ? 'selected="selected"' : '' ?>><?= $name ?></option>
                         <? endforeach; ?>
                     </select>
                 <? else: ?>
-                    <select id="studiengaenge" name="studiengaenge[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.getAbschluesse(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" data-update-url="<?= $controller->url_for('get_abschluesse') ?>">
-                        <? foreach($studiengaenge as $id => $name): ?>
-                            <option value="<?= $id ?>" <?= in_array($id, $selected_studiengaenge) ? 'selected="selected"' : '' ?>><?= $name ?></option>
+                    <select id="faecher" name="faecher[]" multiple style="height:200px" onchange="STUDIP.StudiengaengeWidget.getAbschluesse(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" data-update-url="<?= $controller->url_for('get_abschluesse') ?>">
+                        <? foreach($faecher as $id => $name): ?>
+                            <option value="<?= $id ?>" <?= in_array($id, $selected_faecher) ? 'selected="selected"' : '' ?>><?= $name ?></option>
                         <? endforeach; ?>
                     </select>
                 <? endif; ?>
@@ -38,9 +38,9 @@
                 <div id="step_2">
                 <? if($edit): ?>
                 <? if($path == 'abschluss'): ?>
-                    <select id="studiengaenge" name="studiengaenge[]" multiple onchange="STUDIP.StudiengaengeWidget.count(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" style="height:200px">
-                        <? foreach($studiengaenge as $id => $name): ?>
-                            <option value="<?= $id ?>" <?= in_array($id, $selected_studiengaenge) ? 'selected="selected"' : '' ?>><?= $name ?></option>
+                    <select id="faecher" name="faecher[]" multiple onchange="STUDIP.StudiengaengeWidget.count(this)" data-counter-url="<?= $controller->url_for('count_users') ?>" style="height:200px">
+                        <? foreach($faecher as $id => $name): ?>
+                            <option value="<?= $id ?>" <?= in_array($id, $selected_faecher) ? 'selected="selected"' : '' ?>><?= $name ?></option>
                         <? endforeach; ?>
                     </select>
                 <? else: ?>

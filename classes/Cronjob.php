@@ -58,18 +58,18 @@ class Cronjob extends \CronJob
         $user_ids = DBManager::get()
             ->query("SELECT DISTINCT us.user_id FROM studiengang_news_entries e
                      INNER JOIN studiengang_news_abschluss a using(news_id)
-                     INNER JOIN studiengang_news_studiengang s using(news_id)
+                     INNER JOIN studiengang_news_fach s using(news_id)
                      INNER JOIN user_studiengang us
                          ON  us.user_id IN (SELECT user_id FROM auth_user_md5 WHERE perms='tutor')
                          AND (a.abschluss_id = '' OR a.abschluss_id = us.abschluss_id)
-                         AND (s.studiengang_id = '' OR s.studiengang_id = us.studiengang_id)
+                         AND (s.fach_id = '' OR s.fach_id = us.fach_id)
                          AND (fs_qualifier = 'no_filter'
                              OR (fs_qualifier = 'equals' AND us.semester = e.fachsemester)
                              OR (fs_qualifier = 'smaller_equals' AND us.semester <= e.fachsemester)
                              OR (fs_qualifier = 'greater_equals' AND us.semester >= e.fachsemester))
                      INNER JOIN mod_zuordnung mz
                          ON us.abschluss_id = mz.abschluss_id
-                         AND us.studiengang_id = mz.fach_id
+                         AND us.fach_id = mz.fach_id
                          AND mz.fk_id = e.fk_id
                      WHERE expires > UNIX_TIMESTAMP() AND e.activated = '0'")
             ->fetchAll(PDO::FETCH_COLUMN);

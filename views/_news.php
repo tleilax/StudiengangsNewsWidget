@@ -21,10 +21,10 @@
                 <span style="color: #050;"><?= $entry->views ?></span>
                 <? if ($is_admin): ?>
                     <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
-                        <?= Assets::img('icons/16/blue/edit.png', tooltip2(_('Eintrag bearbeiten'))) ?>
+                        <?= Icon::create('edit', 'clickable', tooltip2(_('Eintrag bearbeiten'))) ?>
                     </a>
                     <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                        <?= Assets::input('icons/16/blue/trash.png', tooltip2(_('Eintrag löschen'))) ?>
+                        <?= Icon::create('trash', 'clickable', tooltip2(_('Eintrag löschen')))->asInput() ?>
                     </form>
                 <? endif; ?>
             </nav>

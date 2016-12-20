@@ -62,7 +62,7 @@ STUDIP.StudiengaengeWidget = {
         $('#path_table').html($('<img>').attr('src', STUDIP.ASSETS_URL + 'images/ajax_indicator_small.gif'));
         $('#path_table').load(url);
     },
-    getStudiengaenge: function (element) {
+    getFaecher: function (element) {
         var selMulti = $.map($("#abschluesse option:selected"), function (el, i) {
             return $(el).val();
         });
@@ -74,7 +74,7 @@ STUDIP.StudiengaengeWidget = {
         STUDIP.StudiengaengeWidget.count(element);
     },
     getAbschluesse: function (element) {
-        var selMulti = $.map($("#studiengaenge option:selected"), function (el, i) {
+        var selMulti = $.map($("#faecher option:selected"), function (el, i) {
             return $(el).val();
         });
         var fk_id = $('#faculty_id option:selected' ).val();
@@ -103,7 +103,7 @@ STUDIP.StudiengaengeWidget = {
         var fk_id = $('#faculty_id option:selected' ).val();
         var fs_qualifier = $('#fs_qualifier option:selected' ).val();
         var fachsemester = $('#fachsemester option:selected' ).val();
-        var studiengaenge = $.map($("#studiengaenge option:selected"), function (el, i) {
+        var faecher = $.map($("#faecher option:selected"), function (el, i) {
             return $(el).val();
         });
         var abschluesse = $.map($("#abschluesse option:selected"), function (el, i) {
@@ -111,7 +111,7 @@ STUDIP.StudiengaengeWidget = {
         });
 
         var textSrc = $(element).data('counter-url').split('?');
-        var url = textSrc[0] + '?studiengang_ids=' + encodeURIComponent(studiengaenge.join("_"))
+        var url = textSrc[0] + '?fach_ids=' + encodeURIComponent(faecher.join("_"))
                              + '&abschluss_ids=' + encodeURIComponent(abschluesse.join("_"))
                              + '&fk_id=' + encodeURIComponent(fk_id) + '&fs_qualifier=' + encodeURIComponent(fs_qualifier)
                              + '&fachsemester=' + encodeURIComponent(fachsemester);

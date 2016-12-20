@@ -43,7 +43,7 @@ class SetupDb extends Migration
                       PRIMARY KEY (`news_id`, `abschluss_id`)
                   )";
         DBManager::get()->exec($query);
-        $query = "CREATE TABLE IF NOT EXISTS `studiengang_news_studiengang` (
+        $query = "CREATE TABLE IF NOT EXISTS `studiengang_news_fach` (
                       `news_id` CHAR(32) NOT NULL,
                       `studiengang_id` CHAR(32) DEFAULT NULL,
                       PRIMARY KEY (`news_id`, `studiengang_id`)
@@ -60,7 +60,7 @@ class SetupDb extends Migration
     {
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_entries`");
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_abschluss`");
-        DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_studiengang`");
+        DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_fach`");
         SimpleORMap::expireTableScheme();
     }
 }

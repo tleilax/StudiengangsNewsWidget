@@ -30,7 +30,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         }
 
         $this->faculties = $faculties;          // All faculties the user is allowed to write news for.
-        $this->is_admin = !empty($faculties);   // True when the user can post news.
+        $this->is_admin  = !empty($faculties);  // True when the user can post news.
 
         PageLayout::addScript($this->getPluginURL() . '/assets/studiengangsnewswidget.js');
     }
@@ -135,13 +135,25 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      * XHR: Fetches the entries for a given study course.
      * @param $abschl_stg_combo
      */
-    public function get_entries_action($abschl_stg_combo)
+    public function get_entries_action($abschl_stg_combo = '-')
     {
         if(!$this->is_admin) {
             return;
         }
 
-        $template = $this->getTemplate('_news.php');
+        $abschluss_ids = [];
+        $fach_ids = [];
+
+        // Reminder: Needs two different instances of $study_courses, one for select, one for entries themselves.
+        if($abschl_stg_combo != '-' && count(explode('_', $abschl_stg_combo)) == 2) {
+            $exp = explode('_', Request::get('study_course_selection'));
+            $abschluss_ids[] = $exp[0];
+            $fach_ids[]      = $exp[1];
+        }
+        $template = $this->getTemplate('_admin_select.php');
+        $template->faculties = $this->faculties;
+        $template->selected = $abschl_stg_combo;
+        $template->study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties));
         if($abschl_stg_combo == '-') {
             $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties));
         } else {

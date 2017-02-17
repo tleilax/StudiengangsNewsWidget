@@ -52,12 +52,12 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_admin) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
-            $nav->setImage('icons/16/blue/add.png', tooltip2(_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add', 'clickable') , tooltip2(_('Eintrag hinzufügen')) + array('data-dialog' => ''));
             $navigation[] = $nav;
         }
         if($this->is_root) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
-            $nav->setImage('icons/16/blue/admin.png', tooltip2(_('Einstellungen')) + ['data-dialog' => 'size=auto']);
+            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + array('data-dialog' => 'size=auto'));
             $navigation[] = $nav;
         }
         return $navigation;

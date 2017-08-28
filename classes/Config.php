@@ -24,4 +24,9 @@ class Config {
         ];
     }
 
+    public static function mapFacultyNumberToId($number)
+    {
+        $mapping = self::Get();
+        return $mapping[$number];
+    }
 }

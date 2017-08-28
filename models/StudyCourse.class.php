@@ -9,7 +9,8 @@ use DBManager;
  * @package StudiengangsNews
  * @author Chris Schierholz<chris.schierholz1@uni-oldenburg.de>
  */
-class StudyCourse {
+class StudyCourse
+{
     private $study_courses;
 
     /**
@@ -21,18 +22,21 @@ class StudyCourse {
      */
     public function __construct($fk_ids = [], $abschluss_ids = [], $fach_ids = [])
     {
-        $fk_ids = (empty($fk_ids))? [1, 2, 3, 4, 5, 6] : $fk_ids;
-        $fk_ids = array_map(function ($val) { return 'x000000000000000000000000000000' . intval($val); } , $fk_ids);
+        $fk_ids = $fk_ids ?: [1, 2, 3, 4, 5, 6];
+        $fk_ids = array_map(function ($val) {
+            return sprintf('x%031u', intval($val));
+        } , $fk_ids);
         $values = [$fk_ids];
-        $query = "SELECT COUNT(*) as count, fk_id, fach_id, abschluss_id, abschluss.name AS abschluss_name,
-                  fach.name AS fach_name
-                  FROM mod_zuordnung INNER JOIN abschluss using (abschluss_Id)
+        $query = "SELECT COUNT(*) AS count, fk_id, fach_id,
+                         abschluss_id, abschluss.name AS abschluss_name,
+                         fach.name AS fach_name
+                  FROM mod_zuordnung INNER JOIN abschluss USING (abschluss_Id)
                   INNER JOIN fach USING(fach_id) WHERE fk_id IN (?)";
-        if(!empty($abschluss_ids)) {
+        if (!empty($abschluss_ids)) {
             $query .= " AND abschluss_id IN (?)";
             $values[] = $abschluss_ids;
         }
-        if(!empty($fach_ids)) {
+        if (!empty($fach_ids)) {
             $query .= " AND fach_id IN (?)";
             $values[] = $fach_ids;
         }
@@ -40,7 +44,7 @@ class StudyCourse {
         $statement = DBManager::get()->prepare($query);
         $statement->execute($values);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
-        $this->study_courses = ($result)? $result : array();
+        $this->study_courses = $result ?: [];
     }
 
     /**
@@ -49,8 +53,8 @@ class StudyCourse {
      */
     public function getSubjects()
     {
-        $result = array();
-        foreach($this->study_courses as $row) {
+        $result = [];
+        foreach ($this->study_courses as $row) {
             $result[$row['fach_id']] = $row['fach_name'];
         }
         return $result;
@@ -61,8 +65,8 @@ class StudyCourse {
      */
     public function getDegrees()
     {
-        $result = array();
-        foreach($this->study_courses as $row) {
+        $result = [];
+        foreach ($this->study_courses as $row) {
             $result[$row['abschluss_id']] = $row['abschluss_name'];
         }
         return $result;
@@ -73,8 +77,8 @@ class StudyCourse {
      */
     public function getAbschlussIDs()
     {
-        $ids = array();
-        foreach($this->study_courses as $study_course) {
+        $ids = [];
+        foreach ($this->study_courses as $study_course) {
             $ids[] = $study_course['abschluss_id'];
         }
         return $ids;
@@ -85,8 +89,8 @@ class StudyCourse {
      */
     public function getFachIDs()
     {
-        $ids = array();
-        foreach($this->study_courses as $study_course) {
+        $ids = [];
+        foreach ($this->study_courses as $study_course) {
             $ids[] = $study_course['fach_id'];
         }
         return $ids;
@@ -99,8 +103,8 @@ class StudyCourse {
     public function getFacultyIDs()
     {
         $fk_ids = [];
-        foreach($this->study_courses as $study_course) {
-            if(!in_array($study_course['fk_id'], $fk_ids)) {
+        foreach ($this->study_courses as $study_course) {
+            if (!in_array($study_course['fk_id'], $fk_ids)) {
                 $fk_ids[] = $study_course ['fk_id'];
             }
         }
@@ -113,11 +117,11 @@ class StudyCourse {
      */
     public function toArray()
     {
-        foreach($this->study_courses as $row) {
+        foreach ($this->study_courses as $row) {
             $abschluesse[$row['abschluss_id']] = $row['abschluss_name'];
             $faecher[$row['fach_id']] = $row['fach_name'];
         }
-        return compact("abschluesse", "faecher");
+        return compact('abschluesse', 'faecher');
     }
 
     /**

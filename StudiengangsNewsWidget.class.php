@@ -5,8 +5,9 @@
  * @author  Chris Schierholz <chris.schierholz1@uni-oldenburg.de>
  * @version 1.0
  */
-class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
+class StudiengangsNewsWidget extends UOL\Plugin implements PortalPlugin
 {
+    const GETTEXT_DOMAIN = 'studiengangnews-widget';
     /**
      * StudiengangsNewsWidget constructor.
      */
@@ -22,8 +23,8 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $this->is_root = $GLOBALS['perm']->have_perm('root');
 
         // Check for assigned Roles.
-        foreach(\StudiengangsNews\Config::Get() as $fk_id => $inst_id) {
-            if(RolePersistence::isAssignedRole($GLOBALS['user']->user_id, 'fk'.intval($fk_id).'_stgnews')
+        foreach (StudiengangsNews\Config::Get() as $fk_id => $inst_id) {
+            if (RolePersistence::isAssignedRole($GLOBALS['user']->user_id, 'fk'.intval($fk_id).'_stgnews')
                 || $this->is_root) {
                 $faculties[intval($fk_id)] = $inst_id;
             }
@@ -40,7 +41,8 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      */
     public function getPluginName()
     {
-        return Config::get()->STG_NEWS_WIDGET_TITLE ?: _('Neuigkeiten zu Ihren Studiengängen');
+        return Config::get()->STG_NEWS_WIDGET_TITLE
+            ?: $this->_('Neuigkeiten zu Ihren Studiengängen');
     }
 
     /**
@@ -52,12 +54,12 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_admin) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
-            $nav->setImage(Icon::create('add', 'clickable') , tooltip2(_('Eintrag hinzufügen')) + array('data-dialog' => ''));
+            $nav->setImage(Icon::create('add', 'clickable') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
         }
         if($this->is_root) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
-            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2(_('Einstellungen')) + array('data-dialog' => 'size=auto'));
+            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2($this->_('Einstellungen')) + ['data-dialog' => 'size=auto']);
             $navigation[] = $nav;
         }
         return $navigation;
@@ -83,7 +85,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
                 $abschluss_ids[] = $exp[0];
                 $fach_ids[] = $exp[1];
             }
-            $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties), $abschluss_ids,
+            $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties), $abschluss_ids,
                 $fach_ids);
             $widget->content = $this->getContent($study_courses);
         } else {
@@ -94,14 +96,14 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
     /**
      * Fetches the entries for a set of study courses.
-     * @param \StudiengangsNews\StudyCourse $study_courses
+     * @param StudiengangsNews\StudyCourse $study_courses
      * @return mixed
      */
-    protected function getContent(\StudiengangsNews\StudyCourse $study_courses)
+    protected function getContent(StudiengangsNews\StudyCourse $study_courses)
     {
         $template = $this->getTemplate('widget.php');
         $template->is_admin = $this->is_admin;
-        $template->entries = \StudiengangsNews\Entry::findByStudyCourses($study_courses);
+        $template->entries = StudiengangsNews\Entry::findByStudyCourses($study_courses);
         $template->selected = Request::get('study_course_selection');
         $template->faculties = $this->faculties;
         $template->study_courses = $study_courses;
@@ -153,12 +155,12 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template = $this->getTemplate('_admin_select.php');
         $template->faculties = $this->faculties;
         $template->selected = $abschl_stg_combo;
-        $template->study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties));
+        $template->study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties));
         if($abschl_stg_combo == '-') {
-            $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties));
+            $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties));
         } else {
             $exp =  explode('_', $abschl_stg_combo);
-            $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties), [$exp[0]], [$exp[1]]);
+            $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties), [$exp[0]], [$exp[1]]);
         }
         $template->is_admin = $this->is_admin;
         $template->entries = StudiengangsNews\Entry::findByStudyCourses($study_courses);
@@ -178,7 +180,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template = $this->getTemplate('_table.php');
         $template->path = $path;
         $template->fk_ids = $fk_ids;
-        $study_courses = new \StudiengangsNews\StudyCourse(explode('_', $fk_ids));
+        $study_courses = new StudiengangsNews\StudyCourse(explode('_', $fk_ids));
         $arr = $study_courses->toArray();
         $template->abschluesse = $arr['abschluesse'];
         $template->faecher = $arr['faecher'];
@@ -201,7 +203,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->path = 'abschluss';
         $template->selected_faecher = [];
         $template->selected_abschluesse = [];
-        $study_courses = new \StudiengangsNews\StudyCourse(explode('_', $fk_ids), explode('_', $abschluss_ids));
+        $study_courses = new StudiengangsNews\StudyCourse(explode('_', $fk_ids), explode('_', $abschluss_ids));
         $template->faecher = $study_courses->getSubjects();
         echo $template->render();
     }
@@ -220,7 +222,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->path = 'fach';
         $template->selected_faecher = [];
         $template->selected_abschluesse = [];
-        $study_courses = new \StudiengangsNews\StudyCourse(explode('_', $fk_ids), [], explode('_', $faecher_ids));
+        $study_courses = new StudiengangsNews\StudyCourse(explode('_', $fk_ids), [], explode('_', $faecher_ids));
         $template->abschluesse = $study_courses->getDegrees();
         echo $template->render();
     }
@@ -236,16 +238,16 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $fach_ids = Request::get('fach_ids');
         $abschluss_ids = Request::get('abschluss_ids');
         $fk_id = Request::get('fk_id');
-        $entry = new \StudiengangsNews\Entry();
+        $entry = new StudiengangsNews\Entry();
         $entry->fk_id = in_array($fk_id, array_keys($this->faculties))
-                      ? ('x000000000000000000000000000000' . intval($fk_id)) : 0;
+                      ? ('x000000000000000000000000000000' . intval($fk_id))
+                      : 0;
         $entry->fs_qualifier = Request::get('fs_qualifier');
         $entry->fachsemester = Request::get('fachsemester');
         $template = $this->getTemplate('_usercount.php');
         $template->filter = [
-            'abschluss_ids' => !empty($abschluss_ids) && $abschluss_ids != '0' ? explode('_', $abschluss_ids) : [],
-            'fach_ids' => !empty($fach_ids) && $fach_ids != '0'
-                ? explode('_', $fach_ids) : [],
+            'abschluss_ids' => $abschluss_ids ? explode('_', $abschluss_ids) : [],
+            'fach_ids'      => $fach_ids ? explode('_', $fach_ids) : [],
         ];
         $template->entry = $entry;
         echo $template->render();
@@ -261,7 +263,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Eintrag hinzufügen'));
+        $this->setPageTitle($this->_('Eintrag hinzufügen'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->entry = new StudiengangsNews\Entry;
@@ -286,11 +288,11 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Eintrag bearbeiten'));
+        $this->setPageTitle($this->_('Eintrag bearbeiten'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->faculties = $this->faculties;
-        $template->entry = \StudiengangsNews\Entry::find($id);
+        $template->entry = StudiengangsNews\Entry::find($id);
         $study_courses_filter = $template->entry->getStudyCoursesFilter();
         $template->path = (empty($study_courses_filter['abschluss_ids']))? 'fach' : 'abschluss';
         $template->selected_faecher = $study_courses_filter['fach_ids'];
@@ -298,22 +300,24 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->edit = true;
 
         if(!in_array(substr($template->entry->fk_id, -1), array_keys($this->faculties))) {
-            throw new AccessDeniedException(_('Sie können keine Ankündigung für die zugehörige Einrichtung bearbeiten'));
+            throw new AccessDeniedException(
+                $this->_('Sie können keine Ankündigung für die zugehörige Einrichtung bearbeiten')
+            );
         }
 
         // Grab all values
-        $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties));
+        $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties));
         $arr = $study_courses->toArray();
         $template->abschluesse = $arr['abschluesse'];
         $template->faecher     = $arr['faecher'];
 
         // Filter
         if($template->path == 'fach') {
-            $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties), [],
+            $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties), [],
                 $study_courses_filter['fach_ids']);
             $template->abschluesse = $study_courses->getDegrees();
         } else {
-            $study_courses = new \StudiengangsNews\StudyCourse(array_keys($this->faculties),
+            $study_courses = new StudiengangsNews\StudyCourse(array_keys($this->faculties),
                 $study_courses_filter['abschluss_ids']);
             $template->faecher = $study_courses->getSubjects();
         }
@@ -336,32 +340,40 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         if (!Request::isPost()) {
             throw new InvalidMethodException();
         }
-        if (Request::get('path') != 'abschluss' && Request::get('path') != 'fach') {
-            PageLayout::postError(_('Bitte wählen Sie den Pfad aus.'));
+
+        $valid = true;
+        if (Request::get('path') !== 'abschluss' && Request::get('path') !== 'fach') {
+            $valid = false;
+            PageLayout::postError($this->_('Bitte wählen Sie den Pfad aus.'));
         }
-        if (Request::get('path') == 'abschluss' && !Request::getArray('abschluesse')) {
-            PageLayout::postError(_('Bitte wählen Sie mindestens ein Abschluss aus.'));
+        if (Request::get('path') === 'abschluss' && !Request::getArray('abschluesse')) {
+            $valid = false;
+            PageLayout::postError($this->_('Bitte wählen Sie mindestens ein Abschluss aus.'));
         }
-        if (Request::get('path') == 'fach' && !Request::getArray('faecher')) {
-            PageLayout::postError(_('Bitte wählen Sie mindestens ein Studiengang aus.'));
+        if (Request::get('path') === 'fach' && !Request::getArray('faecher')) {
+            $valid = false;
+            PageLayout::postError($this->_('Bitte wählen Sie mindestens ein Studiengang aus.'));
         }
 
-        $fach_ids = Request::getArray('faecher', []);
-        $abschluss_ids = Request::getArray('abschluesse', []);
+        if ($valid) {
+            $fach_ids      = Request::getArray('faecher');
+            $abschluss_ids = Request::getArray('abschluesse');
 
-        $entry = new \StudiengangsNews\Entry($id);
-        $entry->fk_id = 'x000000000000000000000000000000' . intval(Request::get('faculty_id'));
-        $entry->subject = Request::get('subject');
-        $entry->fachsemester = Request::get('fachsemester');
-        $entry->fs_qualifier = Request::get('fs_qualifier');
-        $entry->content    = Request::get('content');
-        $entry->user_id    = $GLOBALS['user']->id;
-        $entry->expires    = strtotime(Request::get('expires') . ' 23:59:59');
-        $entry->activated  = 0;
-        $entry->store();
-        $entry->setStudyCourses($abschluss_ids, $fach_ids);
+            $entry = new StudiengangsNews\Entry($id);
+            $entry->fk_id        = StudiengangsNews\Config::mapFacultyNumberToId(Request::int('faculty_id')); // WTF!?
+            $entry->subject      = Request::get('subject');
+            $entry->fachsemester = Request::get('fachsemester');
+            $entry->fs_qualifier = Request::get('fs_qualifier');
+            $entry->content      = Request::get('content');
+            $entry->user_id      = $GLOBALS['user']->id;
+            $entry->expires      = strtotime(Request::get('expires') . ' 23:59:59');
+            $entry->activated    = false;
+            $entry->store();
 
-        PageLayout::postSuccess(_('Der Eintrag wurde gespeichert.'));
+            $entry->setStudyCourses($abschluss_ids, $fach_ids);
+
+            PageLayout::postSuccess($this->_('Der Eintrag wurde gespeichert.'));
+        }
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -371,7 +383,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     public function visit_action()
     {
         $id = Request::option('studiengangsnews-toggle');
-        \StudiengangsNews\Entry::find($id)->is_new = true;
+        StudiengangsNews\Entry::find($id)->is_new = true;
 
         header('Content-Type: application/json');
         echo json_encode(true);
@@ -393,9 +405,9 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new InvalidMethodException();
         }
 
-        \StudiengangsNews\Entry::find($id)->delete();
+        StudiengangsNews\Entry::find($id)->delete();
 
-        PageLayout::postSuccess(_('Der Eintrag wurde gelöscht.'));
+        PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -410,7 +422,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         if (!$this->is_root) {
             throw new AccessDeniedException;
         }
-        echo $this->getContent(new \StudiengangsNews\StudyCourse([], [$abschluss_id], [$fach_id]));
+        echo $this->getContent(new StudiengangsNews\StudyCourse([], [$abschluss_id], [$fach_id]));
     }
 
     /**
@@ -423,15 +435,15 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle(_('Einstellungen'));
+        $this->setPageTitle($this->_('Einstellungen'));
 
         if (Request::isPost()) {
-            $title = Request::get('title', _('Neuigkeiten zu Ihren Studiengängen'));
+            $title = Request::get('title', $this->_('Neuigkeiten zu Ihren Studiengängen'));
             $title = trim($title);
 
             Config::get()->store('STG_NEWS_WIDGET_TITLE', $title);
 
-            PageLayout::postSuccess(_('Die Einstellungen wurden gespeichert.'));
+            PageLayout::postSuccess($this->_('Die Einstellungen wurden gespeichert.'));
             header('Location: ' . URLHelper::getURL('dispatch.php/start'));
             return;
         }
@@ -456,6 +468,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $factory  = new Flexi_TemplateFactory(__DIR__ . '/views');
         $template = $factory->open($template);
         $template->controller = $this;
+        $template->_          = function ($string) { return $this->_($string); };
         if ($layout && !Request::isXhr()) {
             $template->set_layout($GLOBALS['template_factory']->open('layouts/base.php'));
         }

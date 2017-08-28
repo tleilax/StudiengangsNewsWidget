@@ -6,10 +6,18 @@
  */
 class SetupRoles extends Migration
 {
-    const ROLES = ['fk1_stgnews', 'fk2_stgnews', 'fk3_stgnews', 'fk4_stgnews', 'fk5_stgnews' ,'fk6_stgnews'];
-    public function up ()
+    const ROLES = [
+        'fk1_stgnews',
+        'fk2_stgnews',
+        'fk3_stgnews',
+        'fk4_stgnews',
+        'fk5_stgnews',
+        'fk6_stgnews',
+    ];
+
+    public function up()
     {
-        foreach(self::ROLES as $name) {
+        foreach (self::ROLES as $name) {
             $role = new Role();
             $role->setRolename($name);
             $role->setSystemtype(false);
@@ -21,8 +29,8 @@ class SetupRoles extends Migration
     public function down ()
     {
         $roles = RolePersistence::getAllRoles();
-        foreach($roles as $role) {
-            if(in_array($role->getRolename(), self::ROLES)) {
+        foreach ($roles as $role) {
+            if (in_array($role->getRolename(), self::ROLES)) {
                 RolePersistence::deleteRole($role);
             }
         }

@@ -13,18 +13,18 @@
                 </a>
                 <span>
                     <?= strftime('%x', $entry->mkdate) ?>
-                    <? if ($is_root): ?>
-                        /
-                        <?= strftime('%x', $entry->expires) ?>
-                    <? endif; ?>
+                <? if ($is_root): ?>
+                    /
+                    <?= strftime('%x', $entry->expires) ?>
+                <? endif; ?>
                 </span>
                 <span style="color: #050;"><?= $entry->views ?></span>
                 <? if ($is_admin): ?>
                     <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
-                        <?= Icon::create('edit', 'clickable', tooltip2(_('Eintrag bearbeiten'))) ?>
+                        <?= Icon::create('edit', 'clickable')->asImg(tooltip2($_('Eintrag bearbeiten'))) ?>
                     </a>
-                    <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= _('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                        <?= Icon::create('trash', 'clickable', tooltip2(_('Eintrag löschen')))->asInput() ?>
+                    <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= $_('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
+                        <?= Icon::create('trash', 'clickable')->asInput(tooltip2($_('Eintrag löschen'))) ?>
                     </form>
                 <? endif; ?>
             </nav>
@@ -36,6 +36,6 @@
 <? endforeach; ?>
 <? if (!$entries): ?>
     <section>
-        <?= _('Es sind keine Einträge vorhanden') ?>
+        <?= $_('Es sind keine Einträge vorhanden') ?>
     </section>
 <? endif; ?>

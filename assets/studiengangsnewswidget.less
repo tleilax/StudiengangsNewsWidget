@@ -1,5 +1,5 @@
 .studiengangsnews-editor {
-    textarea, input[type=text] {
+    textarea, input[type="text"] {
         .box-sizing(border-box);
         width: 100%;
     }
@@ -26,16 +26,15 @@
             border-right: 0;
         }
         li {
-            display: flex-item;
-            .flex-grow(1);
+            .flex-item(1);
             font-size: 0.9em;
             border-right: 1px solid @base-color-20;
             text-align: center;
-            
+
             &:last-child {
                 border-right: 0;
             }
-            
+
             &.current {
                 background-color: fadeout(@base-color-20, 20%);
                 a {

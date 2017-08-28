@@ -1,3 +1,3 @@
 <fieldset>
-    <strong><?= sprintf(_('%s Benutzer werden diese Ankündigung sehen können.'), $entry->countAddressedUsers($filter))?></strong>
+    <strong><?= sprintf($_('%u Benutzer werden diese Ankündigung sehen können.'), $entry->countAddressedUsers($filter))?></strong>
 </fieldset>

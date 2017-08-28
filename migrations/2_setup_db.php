@@ -25,7 +25,7 @@ class SetupDb extends Migration
                       `news_id` CHAR(32) NOT NULL,
                       `fk_id` CHAR(32) NOT NULL,
                       `fachsemester` INT(2) DEFAULT NULL,
-                      `fs_qualifier` enum ('no_filter', 'equals', 'smaller_equals', 'greater_equals') DEFAULT 'no_filter',
+                      `fs_qualifier` ENUM ('no_filter', 'equals', 'smaller_equals', 'greater_equals') DEFAULT 'no_filter',
                       `subject` VARCHAR(256) NOT NULL,
                       `content` TEXT NOT NULL,
                       `user_id` CHAR(32) NOT NULL,
@@ -43,6 +43,7 @@ class SetupDb extends Migration
                       PRIMARY KEY (`news_id`, `abschluss_id`)
                   )";
         DBManager::get()->exec($query);
+
         $query = "CREATE TABLE IF NOT EXISTS `studiengang_news_studiengang` (
                       `news_id` CHAR(32) NOT NULL,
                       `studiengang_id` CHAR(32) DEFAULT NULL,
@@ -61,6 +62,7 @@ class SetupDb extends Migration
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_entries`");
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_abschluss`");
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_fach`");
+
         SimpleORMap::expireTableScheme();
     }
 }

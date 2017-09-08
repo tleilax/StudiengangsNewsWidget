@@ -2,5 +2,5 @@ pluginname=Studiengang News Widget
 description=Startseiten für Studiengangs-Neuigkeiten
 pluginclassname=StudiengangsNewsWidget
 origin=UOL
-version=1.1
+version=1.2
 studipMinVersion=3.5

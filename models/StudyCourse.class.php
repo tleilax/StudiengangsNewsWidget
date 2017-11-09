@@ -112,7 +112,7 @@ class StudyCourse
     }
 
     /**
-     * Maps IDs -> Name in an array-esque form for abschl¸sse / studieng‰nge.
+     * Maps IDs -> Name in an array-esque form for abschl√ºsse / studieng√§nge.
      * @return array
      */
     public function toArray()

@@ -1,13 +1,13 @@
 <form action="<?= $controller->url_for('store', $entry->id) ?>" method="post" class="studiengangsnews-editor studip_form">
-    <strong><?= $_('Fakultät auswählen') ?>:</strong>
+    <strong><?= $_('FakultÃ¤t auswÃ¤hlen') ?>:</strong>
     <select id="faculty_id" name="faculty_id" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
     <? foreach($faculties as $id => $fk_id): ?>
         <option value="<?= $id ?>" <?= ($id == substr($entry->fk_id, -1))? 'selected="selected"' : '' ?>><?= Institute::find($fk_id)->name ?></option>
     <? endforeach; ?>
     </select>
-    <b><?= $_('Kriterium auswählen') ?>: </b>
+    <b><?= $_('Kriterium auswÃ¤hlen') ?>: </b>
     <select id="path" name="path" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
-        <option value="-">--- <?= $_('Bitte wählen') ?>--- </option>
+        <option value="-">--- <?= $_('Bitte wÃ¤hlen') ?>--- </option>
         <option value="abschluss" <? if ($path === 'abschluss') echo 'selected'; ?>>
             <?= $_('Abschluss') ?>
         </option>

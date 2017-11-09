@@ -7,7 +7,7 @@
                 <?= $_('Titel') ?>
                 <input required type="text" name="title" id="title"
                        value="<?= htmlReady($title) ?>"
-                       placeholder="<?= $_('Neuigkeiten zu Ihren Studiengängen') ?>">
+                       placeholder="<?= $_('Neuigkeiten zu Ihren StudiengÃ¤ngen') ?>">
             </label>
         </fieldset>
     </fieldset>

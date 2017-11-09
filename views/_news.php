@@ -23,8 +23,8 @@
                     <a href="<?= $controller->url_for('edit', $entry->id) ?>" data-dialog>
                         <?= Icon::create('edit', 'clickable')->asImg(tooltip2($_('Eintrag bearbeiten'))) ?>
                     </a>
-                    <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= $_('Wollen Sie diesen Eintrag wirklich löschen?') ?>">
-                        <?= Icon::create('trash', 'clickable')->asInput(tooltip2($_('Eintrag löschen'))) ?>
+                    <form action="<?= $controller->url_for('delete', $entry->id) ?>" method="post" data-confirm="<?= $_('Wollen Sie diesen Eintrag wirklich lÃ¶schen?') ?>">
+                        <?= Icon::create('trash', 'clickable')->asInput(tooltip2($_('Eintrag lÃ¶schen'))) ?>
                     </form>
                 <? endif; ?>
             </nav>
@@ -36,6 +36,6 @@
 <? endforeach; ?>
 <? if (!$entries): ?>
     <section>
-        <?= $_('Es sind keine Einträge vorhanden') ?>
+        <?= $_('Es sind keine EintrÃ¤ge vorhanden') ?>
     </section>
 <? endif; ?>

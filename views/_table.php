@@ -90,7 +90,7 @@
                         <?= $_('Im') ?>
                     </option>
                     <option value="smaller_equals" <? if ($entry->fs_qualifier === 'smaller_equals') echo 'selected'; ?>>
-                        <?= $_('Höchstens') ?>
+                        <?= $_('HÃ¶chstens') ?>
                     </option>
                     <option value="greater_equals" <? if ($entry->fs_qualifier === 'greater_equals') echo 'selected'; ?>>
                         <?= $_('Mindestens') ?>

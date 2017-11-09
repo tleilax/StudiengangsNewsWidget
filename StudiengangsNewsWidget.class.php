@@ -101,7 +101,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     public function getPluginName()
     {
         return Config::get()->STG_NEWS_WIDGET_TITLE
-            ?: $this->_('Neuigkeiten zu Ihren Studiengängen');
+            ?: $this->_('Neuigkeiten zu Ihren StudiengÃ¤ngen');
     }
 
     /**
@@ -113,7 +113,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_admin) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'add'));
-            $nav->setImage(Icon::create('add', 'clickable') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add', 'clickable') , tooltip2($this->_('Eintrag hinzufÃ¼gen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
         }
         if($this->is_root) {
@@ -322,7 +322,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
 
-        $this->setPageTitle($this->_('Eintrag hinzufügen'));
+        $this->setPageTitle($this->_('Eintrag hinzufÃ¼gen'));
 
         $template = $this->getTemplate('edit.php', true);
         $template->entry = new StudiengangsNews\Entry;
@@ -360,7 +360,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if(!in_array(substr($template->entry->fk_id, -1), array_keys($this->faculties))) {
             throw new AccessDeniedException(
-                $this->_('Sie können keine Ankündigung für die zugehörige Einrichtung bearbeiten')
+                $this->_('Sie kÃ¶nnen keine AnkÃ¼ndigung fÃ¼r die zugehÃ¶rige Einrichtung bearbeiten')
             );
         }
 
@@ -403,15 +403,15 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $valid = true;
         if (Request::get('path') !== 'abschluss' && Request::get('path') !== 'fach') {
             $valid = false;
-            PageLayout::postError($this->_('Bitte wählen Sie den Pfad aus.'));
+            PageLayout::postError($this->_('Bitte wÃ¤hlen Sie den Pfad aus.'));
         }
         if (Request::get('path') === 'abschluss' && !Request::getArray('abschluesse')) {
             $valid = false;
-            PageLayout::postError($this->_('Bitte wählen Sie mindestens ein Abschluss aus.'));
+            PageLayout::postError($this->_('Bitte wÃ¤hlen Sie mindestens ein Abschluss aus.'));
         }
         if (Request::get('path') === 'fach' && !Request::getArray('faecher')) {
             $valid = false;
-            PageLayout::postError($this->_('Bitte wählen Sie mindestens ein Studiengang aus.'));
+            PageLayout::postError($this->_('Bitte wÃ¤hlen Sie mindestens ein Studiengang aus.'));
         }
 
         if ($valid) {
@@ -466,7 +466,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         StudiengangsNews\Entry::find($id)->delete();
 
-        PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
+        PageLayout::postSuccess($this->_('Der Eintrag wurde gelÃ¶scht.'));
         header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
@@ -497,7 +497,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $this->setPageTitle($this->_('Einstellungen'));
 
         if (Request::isPost()) {
-            $title = Request::get('title', $this->_('Neuigkeiten zu Ihren Studiengängen'));
+            $title = Request::get('title', $this->_('Neuigkeiten zu Ihren StudiengÃ¤ngen'));
             $title = trim($title);
 
             Config::get()->store('STG_NEWS_WIDGET_TITLE', $title);

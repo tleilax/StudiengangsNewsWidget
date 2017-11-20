@@ -7,10 +7,12 @@
                 </a>
             </h1>
             <nav>
+                <? if($entry->author != NULL): ?>
                 <a href="<?= URLHelper::getLink('dispatch.php/profile?username=' . $entry->author->username) ?>">
                     <?= Avatar::getAvatar($entry->author->id)->getImageTag(Avatar::SMALL) ?>
                     <?= htmlReady($entry->author->getFullname()) ?>
                 </a>
+                <? endif; ?>
                 <span>
                     <?= strftime('%x', $entry->mkdate) ?>
                 <? if ($is_root): ?>

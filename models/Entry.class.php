@@ -26,8 +26,9 @@ class Entry extends SimpleORMap
         $config['db_table'] = 'studiengang_news_entries';
 
         $config['has_one']['author'] = [
-            'class_name'  => 'User',
-            'foreign_key' => 'user_id',
+            'class_name'        => 'User',
+            'assoc_foreign_key' => 'user_id',
+            'foreign_key'       => 'user_id',
         ];
 
         $config['additional_fields']['is_new'] = [

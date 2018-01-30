@@ -418,7 +418,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             $abschluss_ids = Request::getArray('abschluesse');
 
             $entry = new StudiengangsNews\Entry($id);
-            $entry->fk_id        = StudiengangsNews\Config::mapFacultyNumberToId(Request::int('faculty_id')); // WTF!?
+            $entry->fk_id = 'x000000000000000000000000000000' . intval(Request::get('faculty_id')); // Only semi-WTF, this comes from mod_zuordnung.
             $entry->subject      = Request::get('subject');
             $entry->fachsemester = Request::get('fachsemester');
             $entry->fs_qualifier = Request::get('fs_qualifier');

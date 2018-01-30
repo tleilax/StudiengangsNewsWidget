@@ -1,20 +1,24 @@
-<form action="<?= $controller->url_for('store', $entry->id) ?>" method="post" class="studiengangsnews-editor studip_form">
-    <strong><?= $_('Fakultät auswählen') ?>:</strong>
-    <select id="faculty_id" name="faculty_id" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
-    <? foreach($faculties as $id => $fk_id): ?>
-        <option value="<?= $id ?>" <?= ($id == substr($entry->fk_id, -1))? 'selected="selected"' : '' ?>><?= Institute::find($fk_id)->name ?></option>
-    <? endforeach; ?>
-    </select>
-    <b><?= $_('Kriterium auswählen') ?>: </b>
-    <select id="path" name="path" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
-        <option value="-">--- <?= $_('Bitte wählen') ?>--- </option>
-        <option value="abschluss" <? if ($path === 'abschluss') echo 'selected'; ?>>
-            <?= $_('Abschluss') ?>
-        </option>
-        <option value="fach" <? if ($path === 'fach') echo 'selected'; ?>>
-            <?= $_('Fach') ?>
-        </option>
-    </select>
+<form action="<?= $controller->url_for('store', $entry->id) ?>" method="post" class="studiengangsnews-editor default">
+    <label>
+        <strong><?= $_('Fakultät auswählen') ?>:</strong>
+        <select id="faculty_id" name="faculty_id" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
+            <? foreach($faculties as $id => $fk_id): ?>
+                <option value="<?= $id ?>" <?= ($id == substr($entry->fk_id, -1))? 'selected="selected"' : '' ?>><?= Institute::find($fk_id)->name ?></option>
+            <? endforeach; ?>
+        </select>
+    </label>
+    <label>
+        <strong><?= $_('Kriterium auswählen') ?>: </strong>
+        <select id="path" name="path" onchange="STUDIP.StudiengaengeWidget.getTable(this)" data-update-url="<?= $controller->url_for('table') ?>">
+            <option value="-">--- <?= $_('Bitte wählen') ?>--- </option>
+            <option value="abschluss" <? if ($path === 'abschluss') echo 'selected'; ?>>
+                <?= $_('Abschluss') ?>
+            </option>
+            <option value="fach" <? if ($path === 'fach') echo 'selected'; ?>>
+                <?= $_('Fach') ?>
+            </option>
+        </select>
+    </label>
     <br>
     <div id="path_table">
     <? if (!$entry->isNew()): ?>

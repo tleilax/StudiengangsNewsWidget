@@ -35,7 +35,6 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         $this->faculties = $faculties;          // All faculties the user is allowed to write news for.
         $this->is_admin  = !empty($faculties);  // True when the user can post news.
-
         PageLayout::addScript($this->getPluginURL() . '/assets/studiengangsnewswidget.js');
     }
 
@@ -520,7 +519,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     protected function getTemplate($template, $layout = false)
     {
         if (Request::isXhr()) {
-            header('Content-Type: text/html;charset=windows-1252');
+            header('Content-Type: text/html;charset=utf-8');
             header('X-Initialize-Dialog: true');
         }
 
@@ -541,12 +540,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     {
         $args = array_slice(func_get_args(), 1);
         $title = vsprintf($title, $args);
-
-        if (Request::isXhr()) {
-            header('X-Title: ' . $title);
-        } else {
-            PageLayout::setTitle($title);
-        }
+        PageLayout::setTitle($title);
     }
 
     /**

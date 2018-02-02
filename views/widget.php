@@ -9,9 +9,15 @@
 
     <? if ($GLOBALS['perm']->have_perm('root')) : ?>
         <footer>
-            <a href="<?=URLHelper::getLink('?nshow_all=1')?>">
-                <?= $_('Abgelaufene Neuigkeiten anzeigen') ?>
-            </a>
+            <? if (!$_SESSION['old_studycourse_news']) : ?>
+                <a href="<?=URLHelper::getLink('?old_studycourse_news=1')?>">
+                    <?= $_('Abgelaufene Neuigkeiten anzeigen') ?>
+                </a>
+            <? else : ?>
+                <a href="<?=URLHelper::getLink('?old_studycourse_news=0')?>">
+                    <?= $_('Aktive Neuigkeiten anzeigen') ?>
+                </a>
+            <? endif; ?>
         </footer>
     <? endif; ?>
 </article>

@@ -6,6 +6,7 @@
                 <th><?= $_('Inhalt') ?></th>
                 <th><?= $_('Aktiv bis') ?></th>
                 <th><?= $_('Autor') ?></th>
+                <th><?= $_('Studiengänge')?></th>
                 <th><?= $_('Studierende') ?></th>
                 <th><?= $_('Gelesen') ?></th>
                 <th class="actions"></th>
@@ -19,6 +20,9 @@
                     <td><?= strftime('%x', $new['date'] + $new['expire'])?></td>
                     <td><?= htmlReady($new['author'])?></td>
                     <td>
+                        <?= count($new->news_ranges) ?>
+                    </td>
+                    <td>
                         <?= UserStudyCourse::countBySQL('JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
                             JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)
                             WHERE abschluss_id =  :abschluss_id
@@ -31,6 +35,10 @@
                     <td class="actions">
                         <a href="<?= $controller->url_for('edit', $new['news_id'])?>" title="<?= $_('Eintrag bearbeiten')?>" data-dialog>
                             <?= Icon::create('edit', 'clickable')?>
+                        </a>
+                        <a href="<?= $controller->url_for('delete',$new['news_id']) ?>" title="<?= $_('Eintrag löschen')?>"
+                                data-confirm="<?= $_('Wollen Sie die Neuigkeit wirklich löschen')?>">
+                            <?= Icon::create('trash', 'clickable') ?>
                         </a>
                     </td>
                 </tr>

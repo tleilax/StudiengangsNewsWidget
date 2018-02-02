@@ -54,6 +54,11 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             }
         }
 
+        if (!isset($_SESSION['old_studycourse_news'])) {
+            $_SESSION['old_studycourse_news'] = 0;
+        }
+        $_SESSION['old_studycourse_news'] = Request::get('old_studycourse_news', $_SESSION['old_studycourse_news']);
+
         if (!empty($this->faculties)) {
             usort($this->faculties, function($a, $b) {
                 return strcmp($a['name'], $b['name']);
@@ -186,10 +191,25 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
                 $inst_ids[] = $id;
             }
         }
-        $template->studiengaenge = Studiengang::findBySQL(
-            'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-            WHERE Institut_id IN (:inst_ids) GROUP BY mvv_studiengang.studiengang_id ORDER BY name ', [':inst_ids' => $inst_ids]
-        );
+
+        if ($GLOBALS['perm']->have_perm('root') && $_SESSION['old_studycourse_news']) {
+            $template->studiengaenge = Studiengang::findBySQL(
+                    'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                    JOIN news ON (news.news_id = news_range.news_id)
+                    WHERE Institut_id IN (:inst_ids)
+                    AND :time > news.date + expire
+                    GROUP BY mvv_studiengang.studiengang_id ORDER BY name ',
+                [':inst_ids' => $inst_ids, ':time' => time()]);
+        } else {
+            $template->studiengaenge = Studiengang::findBySQL(
+                    'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                    JOIN news ON (news.news_id = news_range.news_id)
+                    WHERE Institut_id IN (:inst_ids)
+                    AND :time <= news.date + expire
+                    GROUP BY mvv_studiengang.studiengang_id ORDER BY name ',
+                [':inst_ids' => $inst_ids, ':time' => time()]);
+        }
+
         return $template->render();
     }
 
@@ -208,7 +228,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             $template->studiengaenge = Studiengang::findByFachAbschluss($user_studycourse->fach_id, $user_studycourse->abschluss_id);
             if (count($template->studiengaenge) > 0) {
                 foreach ($template->studiengaenge as $t) {
-                    $news_tmp = StudipNews::GetNewsByRange($t->studiengang_id, false, true);
+                    $news_tmp = StudipNews::GetNewsByRange($t->studiengang_id, true, true);
                     if (count($news_tmp) > 0) {
                         $foo[$t->studiengang_id] = $news_tmp;
                     }
@@ -231,7 +251,17 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template = $this->getTemplate('news.php');
         $template->controller = $this;
         $template->studiengang = Studiengang::find($studiengang_id);
-        $template->news = StudipNews::GetNewsByRange($studiengang_id);
+        if ($GLOBALS['perm']->have_perm('root') && $_SESSION['old_studycourse_news']) {
+            $template->news = StudipNews::findBySQL(
+                      'JOIN news_range USING (news_id)
+                      WHERE range_id = :range_id
+                      AND :time > news.date + news.expire
+                      ORDER BY date DESC, chdate DESC, topic ASC',
+                  [':time' => time(), ':range_id' => $studiengang_id]);
+        } else {
+            $template->news = StudipNews::GetNewsByRange($studiengang_id, true, true);
+        }
+
         echo $template->render();
     }
 
@@ -283,6 +313,24 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
                 [':ids' => $template->study_courses->pluck('institut_id')]));
 
         echo $template->render();
+    }
+
+    public function delete_action ($news_id)
+    {
+        if (!$this->is_admin) {
+            throw new AccessDeniedException();
+        }
+        $news = StudipNews::find($news_id);
+        if (!is_null($news)) {
+            if ($news->delete()) {
+                PageLayout::postSuccess($this->_('Eintrag erfolgreich gelöscht.'));
+            } else {
+                PageLayout::postError($this->_('Fehler beim Löschen der Eintrags!'));
+            }
+        } else {
+            PageLayout::postError($this->sprintf(_('Kein Eintrag mit der ID %s gefunden.'), $news_id));
+        }
+        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
     /**
@@ -355,28 +403,6 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         object_set_visit($news_id, 'news', $GLOBALS['user']->id);
         object_add_view($news_id);
         echo object_return_views($news_id);
-}
-
-    /**
-     * Deletes an entry.
-     * @param $id
-     * @throws AccessDeniedException
-     * @throws InvalidMethodException
-     */
-    public function delete_action($id)
-    {
-        if (!$this->is_admin) {
-            throw new AccessDeniedException();
-        }
-
-        if (!Request::isPost()) {
-            throw new InvalidMethodException();
-        }
-
-        StudiengangsNews\Entry::find($id)->delete();
-
-        PageLayout::postSuccess($this->_('Der Eintrag wurde gelöscht.'));
-        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
     }
 
     /**

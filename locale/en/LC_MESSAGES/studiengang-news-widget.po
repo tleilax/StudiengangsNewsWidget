@@ -142,3 +142,12 @@ msgstr "Edit settings"
 
 msgid "In eigener Sache"
 msgstr "Internal affairs"
+
+msgid "Keine Studiengänge vorhanden"
+msgstr "No degree program found"
+
+msgid "Aktiv bis"
+msgstr "Active until"
+
+msgid "Gelesen"
+msgstr "read"

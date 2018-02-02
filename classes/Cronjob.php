@@ -50,7 +50,8 @@ class Cronjob extends \CronJob
         //TODO news noch aktuell
         $studiengaenge = \SimpleCollection::createFromArray(
             \Studiengang::findBySQL('JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-                JOIN news ON (news.news_id = news_range.news_id)'));
+                JOIN news ON (news.news_id = news_range.news_id)
+                AND :time <= news.date + news.expire', [':time' => time()]));
 
         $user_ids = array_unique(\SimpleCollection::createFromArray(\UserStudyCourse::findBySQL('JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
                 JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)

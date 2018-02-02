@@ -7,7 +7,7 @@
             onchange="STUDIP.StudiengaengeWidget.getEntries(this)"
             data-update-url="<?= $controller->url_for('get_entries') ?>">
 
-            <option value="">--- <?= $_('Bitte Studiengang auswählen') ?> ---</option>
+            <option value="">--- <?= $_('Studiengang auswählen') ?> ---</option>
             <? foreach ($studiengaenge as $std) : ?>
                 <option value="<?= $std->studiengang_id?>">
                     <?= htmlReady($std->name)?>

@@ -27,15 +27,8 @@ class Cronjob extends \CronJob
      */
     public static function getDescription()
     {
+        //TODO beschreibung anpassen
         return _('Prüft die Gültigkeit der Einträge für "Studiengangs news" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
-    }
-
-    /**
-     * Initializes the cronjob execution. Loads required classes.
-     */
-    public function setUp()
-    {
-        require __DIR__ . '/../models/Entry.class.php';
     }
 
     /**
@@ -47,45 +40,25 @@ class Cronjob extends \CronJob
      */
     public function execute($last_result, $parameters = array())
     {
+
         $info = PluginManager::getInstance()->getPluginInfo('StudiengangsNewsWidget');
         if (!$info) {
             return false;
         }
-
         $plugin_id = $info['id'];
 
-        // Check for new entries that affect users.
-        $query = "SELECT DISTINCT us.user_id
-                  FROM `studiengang_news_entries` AS e
-                  JOIN `studiengang_news_abschluss` AS a USING(`news_id`)
-                  JOIN `studiengang_news_fach` AS s USING(`news_id`)
-                  JOIN `user_studiengang` AS us
-                     ON  us.`user_id` IN (SELECT `user_id` FROM `auth_user_md5` WHERE `perms` = 'tutor')
-                     AND (a.`abschluss_id` = '' OR a.`abschluss_id` = us.`abschluss_id`)
-                     AND (s.`fach_id` = '' OR s.`fach_id` = us.`fach_id`)
-                     AND (`fs_qualifier` = 'no_filter'
-                         OR (`fs_qualifier` = 'equals' AND us.`semester` = e.`fachsemester`)
-                         OR (`fs_qualifier` = 'smaller_equals' AND us.`semester` <= e.`fachsemester`)
-                         OR (`fs_qualifier` = 'greater_equals' AND us.`semester` >= e.`fachsemester`))
-                 JOIN `mod_zuordnung` AS mz
-                     ON us.`abschluss_id` = mz.`abschluss_id`
-                        AND us.`fach_id` = mz.`fach_id`
-                        AND mz.`fk_id` = e.`fk_id`
-                 WHERE `expires` > UNIX_TIMESTAMP() AND e.`activated` = 0";
-        $user_ids = DBManager::get()->query($query)->fetchAll(PDO::FETCH_COLUMN);
+        //TODO news noch aktuell
+        $studiengaenge = \SimpleCollection::createFromArray(
+            \Studiengang::findBySQL('JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                JOIN news ON (news.news_id = news_range.news_id)'));
+
+        $user_ids = array_unique(\SimpleCollection::createFromArray(\UserStudyCourse::findBySQL('JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
+                JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)
+                WHERE abschluss_id IN (:abschluss_ids) AND mvv_stg_stgteil.studiengang_id IN (:studycourse_ids)',
+                ['abschluss_ids' => array_unique($studiengaenge->pluck('abschluss_id')), ':studycourse_ids' => array_unique($studiengaenge->pluck('studiengang_id'))]))->pluck('user_id'));
 
         if(!empty($user_ids)) {
             $this->positionWidget($plugin_id, $user_ids);
-        }
-
-        $entries = Entry::findBySQL("expires > UNIX_TIMESTAMP() AND activated = '0'");
-
-        // Update entries
-        if(!empty($entries)) {
-            foreach($entries as $entry) {
-                $entry->activated = true;
-                $entry->store();
-            }
         }
         return true;
     }

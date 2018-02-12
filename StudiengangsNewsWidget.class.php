@@ -223,15 +223,18 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->is_admin = $this->is_admin;
 
         $foo = [];
-        $template->studiengaenge = [];
+        $foo_studiengaenge = [];
         foreach (UserStudyCourse::findByUser($GLOBALS['user']->user_id) as $user_studycourse) {
-            $template->studiengaenge = Studiengang::findByFachAbschluss($user_studycourse->fach_id, $user_studycourse->abschluss_id);
-            if (count($template->studiengaenge) > 0) {
-                foreach ($template->studiengaenge as $t) {
-                    $news_tmp = StudipNews::GetNewsByRange($t->studiengang_id, true, true);
-                    if (count($news_tmp) > 0) {
-                        $foo[$t->studiengang_id] = $news_tmp;
-                    }
+            foreach(Studiengang::findByFachAbschluss($user_studycourse->fach_id, $user_studycourse->abschluss_id) as $stg) {
+                $foo_studiengaenge[] = $stg;
+            }
+        }
+        $template->studiengaenge = $foo_studiengaenge;
+        if (count($template->studiengaenge) > 0) {
+            foreach ($template->studiengaenge as $t) {
+                $news_tmp = StudipNews::GetNewsByRange($t->studiengang_id, true, true);
+                if (count($news_tmp) > 0) {
+                    $foo[$t->studiengang_id] = $news_tmp;
                 }
             }
         }

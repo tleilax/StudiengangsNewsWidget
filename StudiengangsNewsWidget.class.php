@@ -8,9 +8,7 @@
 class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 {
     const GETTEXT_DOMAIN = 'studiengang-news-widget';
-    /**
-     * StudiengangsNewsWidget constructor.
-     */
+
     public function __construct()
     {
         parent::__construct();

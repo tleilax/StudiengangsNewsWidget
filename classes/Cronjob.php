@@ -1,14 +1,21 @@
 <?php
 namespace StudiengangsNews;
 
-use PluginManager, RolePersistence, DBManager, PDO;
+use CronJob as GloblCronjob;
+use DBManager;
+use PDO;
+use PluginManager;
+use RolePersistence;
+use SimpleCollection;
+use Studiengang;
+use UserStudyCourse;
 
 /**
  * StudiengangsNewsCronjob.php
  *
  * @author  Chris Schierholz <Chris.Schierholz1@uni-oldenburg.de>
  */
-class Cronjob extends \CronJob
+class Cronjob extends GloblCronjob
 {
     /**
      * Returns the name of the cronjob
@@ -17,7 +24,7 @@ class Cronjob extends \CronJob
      */
     public static function getName()
     {
-        return _('"Studiengangs news" Cronjob');
+        return '"Studiengangs News" Cronjob';
     }
 
     /**
@@ -28,7 +35,7 @@ class Cronjob extends \CronJob
     public static function getDescription()
     {
         //TODO beschreibung anpassen
-        return _('Prüft die Gültigkeit der Einträge für "Studiengangs news" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.');
+        return 'Prüft die Gültigkeit der Einträge für "Studiengangs news" und (de)aktiviert das Widget für die entsprechenden Nutzerkreise.';
     }
 
     /**
@@ -48,17 +55,29 @@ class Cronjob extends \CronJob
         $plugin_id = $info['id'];
 
         //TODO news noch aktuell
-        $studiengaenge = \SimpleCollection::createFromArray(
-            \Studiengang::findBySQL('JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-                JOIN news ON (news.news_id = news_range.news_id)
-                AND :time <= news.date + news.expire', [':time' => time()]));
+        $studiengaenge = SimpleCollection::createFromArray(
+            Studiengang::findBySQL(
+                'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                 JOIN news ON (news.news_id = news_range.news_id)
+                   AND :time <= news.date + news.expire',
+                [':time' => time()]
+            )
+        );
 
-        $user_ids = array_unique(\SimpleCollection::createFromArray(\UserStudyCourse::findBySQL('JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
-                JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)
-                WHERE abschluss_id IN (:abschluss_ids) AND mvv_stg_stgteil.studiengang_id IN (:studycourse_ids)',
-                ['abschluss_ids' => array_unique($studiengaenge->pluck('abschluss_id')), ':studycourse_ids' => array_unique($studiengaenge->pluck('studiengang_id'))]))->pluck('user_id'));
+        $user_ids = array_unique(SimpleCollection::createFromArray(
+            UserStudyCourse::findBySQL(
+                'JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
+                 JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)
+                 WHERE abschluss_id IN (:abschluss_ids)
+                   AND mvv_stg_stgteil.studiengang_id IN (:studycourse_ids)',
+                [
+                    'abschluss_ids' => array_unique($studiengaenge->pluck('abschluss_id')),
+                    ':studycourse_ids' => array_unique($studiengaenge->pluck('studiengang_id'))
+                ]
+            )
+        )->pluck('user_id'));
 
-        if(!empty($user_ids)) {
+        if (!empty($user_ids)) {
             $this->positionWidget($plugin_id, $user_ids);
         }
         return true;

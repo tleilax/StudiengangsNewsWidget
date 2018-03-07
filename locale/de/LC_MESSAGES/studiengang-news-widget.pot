@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the StudiengangsNewsWidget package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -10,114 +10,113 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-03-02 13:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Jan-Hendrik Willms <tleilax@gmail.com>, 2017\n"
-"Language-Team: English (https://www.transifex.com/uol-it/teams/52597/en/)\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Neuigkeiten zu Ihren Studiengängen"
-msgstr "News from your degree programme"
+msgstr ""
 
 msgid "Eintrag hinzufügen"
-msgstr "Add entry"
+msgstr ""
 
 msgid "Einstellungen"
-msgstr "Settings"
+msgstr ""
 
 msgid "Eintrag erfolgreich gelöscht."
-msgstr "Entry has been deleted successfully."
+msgstr ""
 
 msgid "Fehler beim Löschen der Eintrags!"
-msgstr "Failed to delete the entry!"
+msgstr ""
 
 #, php-format
 msgid "Kein Eintrag mit der ID %s gefunden."
-msgstr "No entry with id %s could be found."
+msgstr ""
 
 msgid "Neuigkeit erfolgreich gespeichert"
-msgstr "News has been stored"
+msgstr ""
 
 msgid "Fehler beim Speichern der Neuigkeit"
-msgstr "Failed to store the news"
+msgstr ""
 
 msgid "Die Einstellungen wurden gespeichert."
-msgstr "The settings have been saved."
+msgstr ""
 
 msgid "Titel"
-msgstr "Title"
+msgstr ""
 
 msgid "Inhalt"
-msgstr "Content"
+msgstr ""
 
 msgid "Aktiv bis"
-msgstr "Active until"
+msgstr ""
 
 msgid "Autor"
-msgstr "Author"
+msgstr ""
 
 msgid "Studiengänge"
-msgstr "Degree programmes"
+msgstr ""
 
 msgid "Studierende"
-msgstr "Students"
+msgstr ""
 
 msgid "Gelesen"
-msgstr "Read"
+msgstr ""
 
 msgid "Eintrag bearbeiten"
-msgstr "Edit entry"
+msgstr ""
 
 msgid "Eintrag löschen"
-msgstr "Delete entry"
+msgstr ""
 
 msgid "Wollen Sie die Neuigkeit wirklich löschen"
-msgstr "Do you really want to delete this news"
+msgstr ""
 
 #, php-format
 msgid "Keine Neuigkeiten für %s vorhanden"
-msgstr "No news available for %s"
+msgstr ""
 
 msgid "Einstellungen bearbeiten"
-msgstr "Edit settings"
+msgstr ""
 
 msgid "Speichern"
-msgstr "Save"
+msgstr ""
 
 msgid "Abbrechen"
-msgstr "Cancel"
+msgstr ""
 
 msgid "Studienfach"
-msgstr "Subject"
+msgstr ""
 
 msgid "Keine Studiengänge vorhanden"
-msgstr "No degree programmes available"
+msgstr ""
 
 msgid "Es sind keine Einträge vorhanden"
-msgstr "No entries are available"
+msgstr ""
 
 msgid "Studiengang auswählen"
-msgstr "Choose degree programme"
+msgstr ""
 
 msgid "Filtern"
-msgstr "Filter"
+msgstr ""
 
 msgid "Inhalte bearbeiten"
-msgstr "Edit contents"
+msgstr ""
 
 msgid "Anzeigen bis"
-msgstr "Display until"
+msgstr ""
 
 msgid "Titel des Eintrags"
-msgstr "Title of entry"
+msgstr ""
 
 msgid "Inhalt des Eintrags"
-msgstr "Content of entry"
+msgstr ""
 
 msgid "Abgelaufene Neuigkeiten anzeigen"
-msgstr "Show expired news"
+msgstr ""
 
 msgid "Aktive Neuigkeiten anzeigen"
-msgstr "Show active news"
+msgstr ""

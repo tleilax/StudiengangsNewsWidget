@@ -13,7 +13,7 @@ class AddCronjob extends Migration
      */
     public function description()
     {
-        return _('Fügt den Cronjob zum (De)Aktivieren des Widgets hinzu');
+        return 'FÃ¼gt den Cronjob zum (De)Aktivieren des Widgets hinzu';
     }
 
     /**

@@ -27,8 +27,8 @@ class AddConfigEntry extends Migration
                           'global', '', '0', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), :description, '', '')";
         $statement = DBManager::get()->prepare($query);
         $statement->bindValue(':field', 'STG_NEWS_WIDGET_TITLE');
-        $statement->bindValue(':value', 'Neuigkeiten zu Ihren Studiengängen');
-        $statement->bindValue(':description', 'Enthält den Titel des "Neuigkeiten zu ihren Studiengängen"-Widgets');
+        $statement->bindValue(':value', 'Neuigkeiten zu Ihren StudiengÃ¤ngen');
+        $statement->bindValue(':description', 'EnthÃ¤lt den Titel des "Neuigkeiten zu ihren StudiengÃ¤ngen"-Widgets');
         $statement->execute();
     }
 

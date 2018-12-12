@@ -1,4 +1,4 @@
-<form action="<?= $controller->url_for('store', $entry->news_id) ?>" method="post" class="studiengangsnews-editor default">
+<form action="<?= $controller->url_for('store', $entry->news_id) ?>" method="post" class="studiengangsnews-editor default" data-secure="">
     <input type="hidden" id="news_id" value="<?= $entry->news_id ?>">
     <fieldset>
         <legend><?= $_('Filtern') ?>:</legend>

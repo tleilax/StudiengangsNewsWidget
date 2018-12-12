@@ -354,7 +354,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $studycourse_ids = Request::getArray('studycourse_ids');
 
         if (empty($institution_ids) || empty($studycourse_ids)) {
-            PageLayout::postError('asdfasdf');
+            PageLayout::postError($this->_('Fehler beim Speichern der Ankündigung. Es wurde kein Studiengang ausgewählt.'));
         } else {
             $news = StudipNews::find($id);
             if (is_null($news)) {

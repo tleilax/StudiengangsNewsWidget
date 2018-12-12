@@ -47,6 +47,14 @@
         }
     });
 
+    $(document).on('submit', '#studycoursenewswidget', function (e) {
+        if ($(this).find('input:checkbox:checked').length <= 0) {
+            e.preventDefault();
+            alert('Es muss mindestens ein Studiengang ausgewählt sein.');
+            return  false;
+        }
+    });
+
     STUDIP.StudiengaengeWidget = {
         getTable: function (element) {
             var fk_ids = $('#faculty_id').val(),

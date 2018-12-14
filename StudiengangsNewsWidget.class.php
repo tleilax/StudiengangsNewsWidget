@@ -498,4 +498,23 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         return PluginEngine::getURL($this, $params, $path);
     }
+
+    /**
+     * @param $to
+     * @return mixed
+     */
+    public function link_for($to)
+    {
+        $arguments = func_get_args();
+        $last = end($arguments);
+        if (is_array($last)) {
+            $params = array_pop($arguments);
+        } else {
+            $params = [];
+        }
+
+        $path = implode('/', $arguments);
+
+        return PluginEngine::getLink($this, $params, $path);
+    }
 }

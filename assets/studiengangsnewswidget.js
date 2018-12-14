@@ -73,13 +73,14 @@
             $('#stg_news_content').load(url);
         },
         showNews: function (element, news_id) {
-            var textSrc = $(element).data('update-url').split('?'),
-                id = '#visit_count_' + news_id,
+            var textSrc  = $(element).data('update-url').split('?'),
+                selector = '[data-news-id-count="' + news_id + '"]',
                 url = textSrc[0] + '/' + encodeURIComponent(news_id);
 
-            $(id).html($('<img>').attr('src', STUDIP.ASSETS_URL + 'images/ajax_indicator_small.gif'));
-            console.log(news_id);
-            $(id).load(url);
+            if ($(element).closest('tbody').is('.collapsed')) {
+                $(selector).html($('<img>').attr('src', STUDIP.ASSETS_URL + 'images/ajax_indicator_small.gif'));
+                $(selector).load(url);
+            }
         },
     };
 }(jQuery, STUDIP));

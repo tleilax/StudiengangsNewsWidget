@@ -1,21 +1,16 @@
 <?php
 namespace StudiengangsNews;
 
-use CronJob as GloblCronjob;
+use CronJob as GlobalCronjob;
 use DBManager;
 use PDO;
 use PluginManager;
-use RolePersistence;
-use SimpleCollection;
-use Studiengang;
-use UserStudyCourse;
 
 /**
- * StudiengangsNewsCronjob.php
- *
- * @author  Chris Schierholz <Chris.Schierholz1@uni-oldenburg.de>
+ * @author  Jan-Hendrik Willms <tleilax+studip@gmail.com>
+ * @license GPL2 or any later version
  */
-class Cronjob extends GloblCronjob
+class Cronjob extends GlobalCronjob
 {
     /**
      * Returns the name of the cronjob
@@ -45,42 +40,40 @@ class Cronjob extends GloblCronjob
      * @param array $parameters  Any defined parameters
      * @return boolean
      */
-    public function execute($last_result, $parameters = array())
+    public function execute($last_result, $parameters = [])
     {
-
         $info = PluginManager::getInstance()->getPluginInfo('StudiengangsNewsWidget');
         if (!$info) {
-            return false;
+            return;
         }
         $plugin_id = $info['id'];
 
-        //TODO news noch aktuell
-        $studiengaenge = SimpleCollection::createFromArray(
-            Studiengang::findBySQL(
-                'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-                 JOIN news ON (news.news_id = news_range.news_id)
-                   AND :time <= news.date + news.expire',
-                [':time' => time()]
-            )
-        );
+        $query = "SELECT DISTINCT us.`user_id`
+                  FROM `user_studiengang` AS us
+                  -- Study course info
+                  JOIN `mvv_stgteil` AS ms USING (`fach_id`)
+                  JOIN `mvv_stg_stgteil` AS mss USING (`stgteil_id`)
+                  JOIN `mvv_studiengang` AS msc USING (`studiengang_id`, `abschluss_id`)
+                  -- News info
+                  JOIN `news_range` AS nr ON (msc.`studiengang_id` = nr.`range_id`)
+                  JOIN `news` AS n ON (nr.`news_id` = n.`news_id` AND n.`date` + n.`expire` > UNIX_TIMESTAMP())
+                  -- Visited
+                  LEFT JOIN `object_user_visits` AS ouv ON (ouv.`object_id` = n.`news_id` AND ouv.`type` = 'news' AND ouv.`user_id` = us.`user_id`)
+                  -- Widget activated
+                  LEFT JOIN `widget_user` AS wu ON (wu.`range_id` = us.`user_id` AND wu.`pluginid` = :plugin_id)
+                  LEFT JOIN `widget_user` AS wu2 ON (wu2.`range_id` = us.`user_id`)
+                  WHERE ouv.`user_id` IS NULL
+                    AND wu.`range_id` IS NULL
+                  GROUP BY us.`user_id`
+                  HAVING COUNT(wu2.`range_id`) > 0";
+        $statement = DBManager::get()->prepare($query);
+        $statement->bindValue(':plugin_id', $plugin_id);
+        $statement->execute();
+        $user_ids = $statement->fetchAll(PDO::FETCH_COLUMN);
 
-        $user_ids = array_unique(SimpleCollection::createFromArray(
-            UserStudyCourse::findBySQL(
-                'JOIN mvv_stgteil ON (mvv_stgteil.fach_id = user_studiengang.fach_id)
-                 JOIN mvv_stg_stgteil ON (mvv_stg_stgteil.stgteil_id = mvv_stgteil.stgteil_id)
-                 WHERE abschluss_id IN (:abschluss_ids)
-                   AND mvv_stg_stgteil.studiengang_id IN (:studycourse_ids)',
-                [
-                    'abschluss_ids' => array_unique($studiengaenge->pluck('abschluss_id')),
-                    ':studycourse_ids' => array_unique($studiengaenge->pluck('studiengang_id'))
-                ]
-            )
-        )->pluck('user_id'));
-
-        if (!empty($user_ids)) {
+        if (count($user_ids) > 0) {
             $this->positionWidget($plugin_id, $user_ids);
         }
-        return true;
     }
 
     /**

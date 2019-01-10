@@ -128,8 +128,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      */
     public function getPluginName()
     {
-        return Config::get()->STG_NEWS_WIDGET_TITLE
-            ?: $this->_('Neuigkeiten zu Ihren Studiengängen');
+        return $this->_('Neuigkeiten zu Ihren Studiengängen');
     }
 
     /**
@@ -141,14 +140,10 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_admin) {
             $nav = new Navigation('', PluginEngine::getLink($this, [], 'edit'));
-            $nav->setImage(Icon::create('add', 'clickable') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
         }
-        if($this->is_root) {
-            $nav = new Navigation('', PluginEngine::getLink($this, [], 'settings'));
-            $nav->setImage(Icon::create('admin', 'clickable'), tooltip2($this->_('Einstellungen')) + ['data-dialog' => 'size=auto']);
-            $navigation[] = $nav;
-        }
+
         return $navigation;
     }
 
@@ -418,34 +413,6 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException;
         }
         echo $this->getContent(new StudiengangsNews\StudyCourse([], [$abschluss_id], [$fach_id]));
-    }
-
-    /**
-     * Shows settings page.
-     * @throws AccessDeniedException
-     */
-    public function settings_action()
-    {
-        if (!$this->is_root) {
-            throw new AccessDeniedException();
-        }
-
-        $this->setPageTitle($this->_('Einstellungen'));
-
-        if (Request::isPost()) {
-            $title = Request::get('title', $this->_('Neuigkeiten zu Ihren Studiengängen'));
-            $title = trim($title);
-
-            Config::get()->store('STG_NEWS_WIDGET_TITLE', $title);
-
-            PageLayout::postSuccess($this->_('Die Einstellungen wurden gespeichert.'));
-            header('Location: ' . URLHelper::getURL('dispatch.php/start'));
-            return;
-        }
-
-        $template = $this->getTemplate('settings.php', true);
-        $template->title = Config::get()->STG_NEWS_WIDGET_TITLE;
-        echo $template->render();
     }
 
     /**

@@ -34,11 +34,11 @@
                     </td>
                     <td class="actions">
                         <a href="<?= $controller->url_for('edit', $new['news_id'])?>" title="<?= $_('Eintrag bearbeiten')?>" data-dialog>
-                            <?= Icon::create('edit', 'clickable')?>
+                            <?= Icon::create('edit')?>
                         </a>
                         <a href="<?= $controller->url_for('delete',$new['news_id']) ?>" title="<?= $_('Eintrag löschen')?>"
                                 data-confirm="<?= $_('Wollen Sie die Neuigkeit wirklich löschen')?>">
-                            <?= Icon::create('trash', 'clickable') ?>
+                            <?= Icon::create('trash') ?>
                         </a>
                     </td>
                 </tr>

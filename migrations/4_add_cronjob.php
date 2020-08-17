@@ -30,7 +30,7 @@ class AddCronjob extends Migration
     public function down()
     {
         $task_id = CronjobTask::findByFilename($this->getCronjobFilename())->task_id;
-        if($task_id) {
+        if ($task_id) {
             CronjobScheduler::unregisterTask($task_id);
         }
     }
@@ -42,7 +42,6 @@ class AddCronjob extends Migration
      */
     private function getCronjobFilename()
     {
-        return str_replace($GLOBALS['STUDIP_BASE_PATH'] . '/', '',
-                           realpath(__DIR__ . '/../classes/Cronjob.php'));
+        return studip_relative_path(realpath(__DIR__ . '/../classes/Cronjob.php'));
     }
 }

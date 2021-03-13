@@ -50,8 +50,6 @@ class SetupDb extends Migration
                       PRIMARY KEY (`news_id`, `studiengang_id`)
                   )";
         DBManager::get()->exec($query);
-
-        SimpleORMap::expireTableScheme();
     }
 
     /**
@@ -62,7 +60,5 @@ class SetupDb extends Migration
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_entries`");
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_abschluss`");
         DBManager::get()->exec("DROP TABLE IF EXISTS `studiengang_news_fach`");
-
-        SimpleORMap::expireTableScheme();
     }
 }

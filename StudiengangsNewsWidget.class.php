@@ -317,16 +317,14 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             throw new AccessDeniedException();
         }
         $news = StudipNews::find($news_id);
-        if (!is_null($news)) {
-            if ($news->delete()) {
-                PageLayout::postSuccess($this->_('Eintrag erfolgreich gelöscht.'));
-            } else {
-                PageLayout::postError($this->_('Fehler beim Löschen der Eintrags!'));
-            }
+        if (!$news) {
+            PageLayout::postError(sprintf($this->_('Kein Eintrag mit der ID %s gefunden.'), $news_id));
+        } elseif ($news->delete()) {
+            PageLayout::postSuccess($this->_('Eintrag erfolgreich gelöscht.'));
         } else {
-            PageLayout::postError($this->sprintf(_('Kein Eintrag mit der ID %s gefunden.'), $news_id));
+            PageLayout::postError($this->_('Fehler beim Löschen der Eintrags!'));
         }
-        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
+        header('Location: ' . URLHelper::getURL('dispatch.php/start'));
     }
 
     /**
@@ -371,10 +369,9 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             $news->expire = strtotime(Request::get('expires') . ' 23:59:59') - $news->date;
 
             $ranges = [];
-            foreach ($studycourse_ids as $studycourse_id)
-            {
+            foreach ($studycourse_ids as $studycourse_id) {
                 $news_range = NewsRange::find([$news->id, $studycourse_id]);
-                if (is_null($news_range)) {
+                if (!$news_range) {
                     $news_range = new NewsRange();
                     $news_range->news_id = $news->id;
                     $news_range->range_id = $studycourse_id;
@@ -388,7 +385,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
                 PageLayout::postError($this->_('Fehler beim Speichern der Neuigkeit'));
             }
         }
-        header('Location: ' . URLHelper::getLink('dispatch.php/start'));
+        header('Location: ' . URLHelper::getURL('dispatch.php/start'));
     }
 
     /**

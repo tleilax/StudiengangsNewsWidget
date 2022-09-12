@@ -38,7 +38,6 @@ class Cronjob extends GlobalCronjob
      *
      * @param mixed $last_result The result of the last execution
      * @param array $parameters  Any defined parameters
-     * @return boolean
      */
     public function execute($last_result, $parameters = [])
     {
@@ -48,25 +47,43 @@ class Cronjob extends GlobalCronjob
         }
         $plugin_id = $info['id'];
 
+        $news_plugin_id = $this->getNewsPluginId();
+        if (!$news_plugin_id) {
+            return;
+        }
+
         $query = "SELECT DISTINCT us.`user_id`
                   FROM `user_studiengang` AS us
                   -- Study course info
-                  JOIN `mvv_stgteil` AS ms USING (`fach_id`)
-                  JOIN `mvv_stg_stgteil` AS mss USING (`stgteil_id`)
-                  JOIN `mvv_studiengang` AS msc USING (`studiengang_id`, `abschluss_id`)
+                  JOIN `mvv_stgteil` AS ms
+                    USING (`fach_id`)
+                  JOIN `mvv_stg_stgteil` AS mss
+                    USING (`stgteil_id`)
+                  JOIN `mvv_studiengang` AS msc
+                    USING (`studiengang_id`, `abschluss_id`)
                   -- News info
-                  JOIN `news_range` AS nr ON (msc.`studiengang_id` = nr.`range_id`)
-                  JOIN `news` AS n ON (nr.`news_id` = n.`news_id` AND n.`date` + n.`expire` > UNIX_TIMESTAMP())
+                  JOIN `news_range` AS nr
+                    ON msc.`studiengang_id` = nr.`range_id`
+                  JOIN `news` AS n
+                    ON nr.`news_id` = n.`news_id`
+                      AND n.`date` + n.`expire` > UNIX_TIMESTAMP()
                   -- Visited
-                  LEFT JOIN `object_user_visits` AS ouv ON (ouv.`object_id` = n.`news_id` AND ouv.`type` = 'news' AND ouv.`user_id` = us.`user_id`)
+                  LEFT JOIN `object_user_visits` AS ouv
+                    ON ouv.`object_id` = n.`news_id`
+                      AND ouv.`plugin_id` = :news_plugin_id
+                      AND ouv.`user_id` = us.`user_id`
                   -- Widget activated
-                  LEFT JOIN `widget_user` AS wu ON (wu.`range_id` = us.`user_id` AND wu.`pluginid` = :plugin_id)
-                  LEFT JOIN `widget_user` AS wu2 ON (wu2.`range_id` = us.`user_id`)
+                  LEFT JOIN `widget_user` AS wu
+                    ON wu.`range_id` = us.`user_id`
+                      AND wu.`pluginid` = :plugin_id
+                  LEFT JOIN `widget_user` AS wu2
+                    ON wu2.`range_id` = us.`user_id`
                   WHERE ouv.`user_id` IS NULL
                     AND wu.`range_id` IS NULL
                   GROUP BY us.`user_id`
                   HAVING COUNT(wu2.`range_id`) > 0";
         $statement = DBManager::get()->prepare($query);
+        $statement->bindValue(':news_plugin_id', $news_plugin_id);
         $statement->bindValue(':plugin_id', $plugin_id);
         $statement->execute();
         $user_ids = $statement->fetchAll(PDO::FETCH_COLUMN);
@@ -120,5 +137,15 @@ class Cronjob extends GlobalCronjob
         $statement->bindValue(':plugin_id', $plugin_id);
         $statement->bindValue(':user_ids', $user_ids);
         $statement->execute();
+    }
+
+    private function getNewsPluginId(): ?int
+    {
+        $info = PluginManager::getInstance()->getPluginInfo('StudiengangsNewsWidget');
+        if (!$info) {
+            return null;
+        }
+
+        return (int) $info['id'];
     }
 }

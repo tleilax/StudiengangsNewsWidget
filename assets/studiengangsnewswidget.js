@@ -9,15 +9,11 @@
         });
     }
 
-    $(document).on('ajaxComplete', function (event, jqxhr) {
-        if (jqxhr.getResponseHeader('X-Initialize-Dialog')) {
-            $('.ui-dialog-content textarea.add_toolbar').addToolbar();
-            $('.ui-dialog-content .has-datepicker').datepicker();
-        }
-    });
-
     $(document).on('submit', '.studiengangsnews-editor', function (event) {
-        if ($('.multi-checkbox-required :checkbox', this).length > 0 && $('.multi-checkbox-required :checkbox:checked', this).length === 0) {
+        if (
+            $('.multi-checkbox-required :checkbox', this).length > 0
+            && $('.multi-checkbox-required :checkbox:checked', this).length === 0
+        ) {
             alert('Bitte wählen Sie mindestens eine Sichtbarkeit aus.'.toLocaleString());
             event.preventDefault();
         }

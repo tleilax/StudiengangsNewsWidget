@@ -1,5 +1,14 @@
-<form action="<?= $controller->url_for('store', $entry->news_id) ?>" method="post" class="studiengangsnews-editor default" data-secure="" id="studycoursenewswidget">
-    <input type="hidden" id="news_id" value="<?= $entry->news_id ?>">
+<?php
+/**
+ * @var StudiengangsNewsWidget $controller
+ * @var StudipNews $entry
+ * @var callable $_
+ * @var array $faculties
+ * @var Studiengang[] $study_courses
+ */
+?>
+<form action="<?= $controller->link_for('store', $entry->news_id) ?>" method="post" class="studiengangsnews-editor default" data-secure="" id="studycoursenewswidget">
+    <input type="hidden" id="news_id" value="<?= htmlReady($entry->news_id) ?>">
     <fieldset>
         <legend><?= $_('Filtern') ?>:</legend>
 
@@ -8,7 +17,7 @@
             data-update-url="<?= $controller->url_for('table') ?>"
             style="height: 200px; margin-bottom: 15px;" multiple>
 
-            <? foreach($faculties as $fac_id => $faculty): ?>
+            <? foreach ($faculties as $fac_id => $faculty): ?>
                 <optgroup label="<?= htmlReady($faculty['name']) ?>">
                     <? foreach($faculties[$fac_id]['sub'] as $inst) : ?>
                         <option value="<?= $inst['institut_id']?>"
@@ -21,8 +30,11 @@
         </select>
 
         <div id="path_table">
-            <?= $this->render_partial('_studycourses',
-                ['selected_study_courses' => $study_courses->pluck('studiengang_id'), 'studycourses' => $all_study_courses, 'graduation_id' => array_unique($all_study_courses->pluck('abschluss_id'))]) ?>
+            <?= $this->render_partial('_studycourses', [
+                'selected_study_courses' => $study_courses->pluck('studiengang_id'),
+                'studycourses' => $all_study_courses,
+                'graduation_id' => array_unique($all_study_courses->pluck('abschluss_id')),
+            ]) ?>
         </div>
     </fieldset>
 
@@ -30,7 +42,7 @@
         <legend class="hide-in-dialog"><?= $_('Inhalte bearbeiten') ?></legend>
         <fieldset>
             <label for="expires"><?= $_('Anzeigen bis') ?></label>
-            <input type="text" id="expires" name="expires" class="has-datepicker" value="<?= date('d.m.Y', $entry->date + $entry->expire ?: time()) ?>">
+            <input type="text" id="expires" name="expires" data-date-picker value="<?= date('d.m.Y', $entry->date + $entry->expire ?: time()) ?>">
         </fieldset>
 
         <fieldset>
@@ -40,7 +52,7 @@
 
         <fieldset>
             <label for="content"><?= $_('Inhalt') ?></label>
-            <textarea required name="content" id="content" class="add_toolbar" data-secure placeholder="<?= $_('Inhalt des Eintrags') ?>"><?= htmlReady($entry->body) ?></textarea>
+            <textarea required name="content" id="content" class="wysiwyg" data-secure placeholder="<?= $_('Inhalt des Eintrags') ?>"><?= htmlReady($entry->body) ?></textarea>
         </fieldset>
     </fieldset>
 

@@ -1,0 +1,35 @@
+.studiengangsnews-widget {
+    .widget-tabs {
+        ul,
+        li {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            border: 1px solid var(--base-color-20);
+            border-left: 0;
+            border-right: 0;
+        }
+        li {
+            flex: 1;
+            font-size: 0.9em;
+            border-right: 1px solid var(--base-color-20);
+            text-align: center;
+
+            &:last-child {
+                border-right: 0;
+            }
+
+            &.current {
+                background-color: fade-out($base-color-20, 0.2);
+                a {
+                    color: var(--black);
+                }
+            }
+        }
+    }
+}

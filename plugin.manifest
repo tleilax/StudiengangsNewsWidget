@@ -3,4 +3,5 @@ description=Startseiten für Studiengangs-Neuigkeiten
 pluginclassname=StudiengangsNewsWidget
 origin=UOL
 version=2.4
-studipMinVersion=5.4
+studipMinVersion=5.0
+localedomain=studiengang-news-widget

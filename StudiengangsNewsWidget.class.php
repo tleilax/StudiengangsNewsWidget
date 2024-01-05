@@ -7,14 +7,10 @@
  */
 class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 {
-    const GETTEXT_DOMAIN = 'studiengang-news-widget';
-
     public function __construct()
     {
         parent::__construct();
 
-        bindtextdomain(static::GETTEXT_DOMAIN, $this->getPluginPath() . '/locale');
-        bind_textdomain_codeset(static::GETTEXT_DOMAIN, 'UTF-8');
         StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/classes', 'StudiengangsNews');
 
         $this->is_root = $GLOBALS['perm']->have_perm('root');
@@ -40,22 +36,15 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
                     $this->faculties[$fac->institut_id] = $fac->toArray();
                     $this->faculties[$fac->institut_id]['sub'] = $tmp_inst;
                 }
-            } else {
-                if (Studiengang::countBySQL('institut_id = ?', [$fac->institut_id])) {
-                    if (!isset($this->faculties[$fac->faculty->institut_id])) {
-                        $this->faculties[$fac->faculty->institut_id] = $fac->faculty->toArray();
-                    }
-                    if (!isset($this->faculties[$fac->faculty->institut_id]['sub'][$fac->institut_id])) {
-                        $this->faculties[$fac->faculty->institut_id]['sub'][$fac->institut_id] = $fac->toArray();
-                    }
+            } elseif (Studiengang::countBySQL('institut_id = ?', [$fac->institut_id])) {
+                if (!isset($this->faculties[$fac->faculty->institut_id])) {
+                    $this->faculties[$fac->faculty->institut_id] = $fac->faculty->toArray();
+                }
+                if (!isset($this->faculties[$fac->faculty->institut_id]['sub'][$fac->institut_id])) {
+                    $this->faculties[$fac->faculty->institut_id]['sub'][$fac->institut_id] = $fac->toArray();
                 }
             }
         }
-
-        if (!isset($_SESSION['old_studycourse_news'])) {
-            $_SESSION['old_studycourse_news'] = 0;
-        }
-        $_SESSION['old_studycourse_news'] = Request::get('old_studycourse_news', $_SESSION['old_studycourse_news']);
 
         if (!empty($this->faculties)) {
             usort($this->faculties, function($a, $b) {
@@ -63,64 +52,13 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
             });
         }
 
-        $this->is_admin  = !empty($this->faculties);  // True when the user can post news.
-        PageLayout::addScript($this->getPluginURL() . '/assets/studiengangsnewswidget.js');
-    }
+        $_SESSION['old_studycourse_news'] = Request::get(
+            'old_studycourse_news',
+            $_SESSION['old_studycourse_news'] ?? 0
+        );
 
-    /**
-     * Plugin localization for a single string.
-     * This method supports sprintf()-like execution if you pass additional
-     * parameters.
-     *
-     * @param String $string String to translate
-     * @return translated string
-     */
-    public function _($string)
-    {
-        $result = static::GETTEXT_DOMAIN === null
-                ? $string
-                : dcgettext(static::GETTEXT_DOMAIN, $string, LC_MESSAGES);
-        if ($result === $string) {
-            $result = _($string);
-        }
-
-        if (func_num_args() > 1) {
-            $arguments = array_slice(func_get_args(), 1);
-            $result = vsprintf($result, $arguments);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Plugin localization for plural strings.
-     * This method supports sprintf()-like execution if you pass additional
-     * parameters.
-     *
-     * @param String $string0 String to translate (singular)
-     * @param String $string1 String to translate (plural)
-     * @param mixed  $n       Quantity factor (may be an array or array-like)
-     * @return translated string
-     */
-    public function _n($string0, $string1, $n)
-    {
-        if (is_array($n)) {
-            $n = count($n);
-        }
-
-        $result = static::GETTEXT_DOMAIN === null
-                ? $string0
-                : dngettext(static::GETTEXT_DOMAIN, $string0, $string1, $n);
-        if ($result === $string0 || $result === $string1) {
-            $result = ngettext($string0, $string1, $n);
-        }
-
-        if (func_num_args() > 3) {
-            $arguments = array_slice(func_get_args(), 3);
-            $result = vsprintf($result, $arguments);
-        }
-
-        return $result;
+        $this->is_admin = !empty($this->faculties);  // True when the user can post news.
+        $this->addScript('assets/studiengangsnewswidget.js');
     }
 
     /**
@@ -139,7 +77,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $navigation = [];
 
         if ($this->is_admin) {
-            $nav = new Navigation('', PluginEngine::getLink($this, [], 'edit'));
+            $nav = new Navigation('', PluginEngine::getURL($this, [], 'edit'));
             $nav->setImage(Icon::create('add') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
             $navigation[] = $nav;
         }
@@ -153,7 +91,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      */
     public function getPortalTemplate()
     {
-        $this->addStylesheet('assets/studiengangsnewswidget.less');
+        $this->addStylesheet('assets/studiengangsnewswidget.scss');
         $widget = $GLOBALS['template_factory']->open('shared/string');
 
         $widget->icons = $this->getNavigation();
@@ -169,38 +107,44 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
     /**
      * Fetches the entries for a set of study courses.
-     * @param StudiengangsNews\StudyCourse $study_courses
-     * @return mixed
      */
-    protected function getContent()
+    protected function getContent(): string
     {
         $template = $this->getTemplate('widget.php');
         $template->is_admin = $this->is_admin;
         $template->faculties = $this->faculties;
-        $inst_ids = [];
 
+        $inst_ids = [];
         foreach ($this->faculties as $id => $faculty) {
-            foreach ($this->faculties[$id]['sub'] as $id => $inst) {
-                $inst_ids[] = $id;
-            }
+            $inst_ids = array_merge(
+                $inst_ids,
+                array_keys($this->faculties[$id]['sub'])
+            );
         }
 
-        if ($GLOBALS['perm']->have_perm('root') && $_SESSION['old_studycourse_news']) {
+        if (
+            $GLOBALS['perm']->have_perm('root')
+            && !empty($_SESSION['old_studycourse_news'])
+        ) {
             $template->studiengaenge = Studiengang::findBySQL(
-                    'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-                    JOIN news ON (news.news_id = news_range.news_id)
-                    WHERE Institut_id IN (:inst_ids)
-                    AND :time > news.date + expire
-                    GROUP BY mvv_studiengang.studiengang_id ORDER BY name ',
-                [':inst_ids' => $inst_ids, ':time' => time()]);
+                "JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                JOIN news ON (news.news_id = news_range.news_id)
+                WHERE Institut_id IN (:inst_ids)
+                AND UNIX_TIMESTAMP() > news.date + expire
+                GROUP BY mvv_studiengang.studiengang_id
+                ORDER BY name",
+                [':inst_ids' => $inst_ids]
+            );
         } else {
             $template->studiengaenge = Studiengang::findBySQL(
-                    'JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
-                    JOIN news ON (news.news_id = news_range.news_id)
-                    WHERE Institut_id IN (:inst_ids)
-                    AND :time <= news.date + expire
-                    GROUP BY mvv_studiengang.studiengang_id ORDER BY name ',
-                [':inst_ids' => $inst_ids, ':time' => time()]);
+                "JOIN news_range ON (mvv_studiengang.studiengang_id = news_range.range_id)
+                JOIN news ON (news.news_id = news_range.news_id)
+                WHERE Institut_id IN (:inst_ids)
+                AND UNIX_TIMESTAMP() <= news.date + expire
+                GROUP BY mvv_studiengang.studiengang_id
+                ORDER BY name",
+                [':inst_ids' => $inst_ids]
+            );
         }
 
         return $template->render();
@@ -215,14 +159,15 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template = $this->getTemplate('widget.php');
         $template->is_admin = $this->is_admin;
 
-        $foo = [];
         $foo_studiengaenge = [];
-        foreach (UserStudyCourse::findByUser($GLOBALS['user']->user_id) as $user_studycourse) {
-            foreach(Studiengang::findByFachAbschluss($user_studycourse->fach_id, $user_studycourse->abschluss_id) as $stg) {
+        foreach (UserStudyCourse::findByUser(User::findCurrent()->id) as $user_studycourse) {
+            foreach (Studiengang::findByFachAbschluss($user_studycourse->fach_id, $user_studycourse->abschluss_id) as $stg) {
                 $foo_studiengaenge[] = $stg;
             }
         }
         $template->studiengaenge = $foo_studiengaenge;
+
+        $foo = [];
         if (count($template->studiengaenge) > 0) {
             foreach ($template->studiengaenge as $t) {
                 $news_tmp = StudipNews::GetNewsByRange($t->studiengang_id, true, true);
@@ -237,23 +182,27 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
     /**
      * XHR: Fetches the entries for a given study course.
-     * @param $abschl_stg_combo
+     * @param string $studiengang_id
      */
-    public function get_entries_action($studiengang_id)
+    public function get_entries_action(string $studiengang_id)
     {
-        if(!$this->is_admin) {
+        if (!$this->is_admin) {
             return;
         }
         $template = $this->getTemplate('news.php');
         $template->controller = $this;
         $template->studiengang = Studiengang::find($studiengang_id);
-        if ($GLOBALS['perm']->have_perm('root') && $_SESSION['old_studycourse_news']) {
+        if (
+            $GLOBALS['perm']->have_perm('root')
+            && !empty($_SESSION['old_studycourse_news'])
+        ) {
             $template->news = StudipNews::findBySQL(
-                      'JOIN news_range USING (news_id)
-                      WHERE range_id = :range_id
-                      AND :time > news.date + news.expire
-                      ORDER BY date DESC, chdate DESC, topic ASC',
-                  [':time' => time(), ':range_id' => $studiengang_id]);
+                'JOIN news_range USING (news_id)
+                  WHERE range_id = :range_id
+                  AND :time > news.date + news.expire
+                  ORDER BY date DESC, chdate DESC, topic ASC',
+                [':time' => time(), ':range_id' => $studiengang_id]
+            );
         } else {
             $template->news = StudipNews::GetNewsByRange($studiengang_id, true, true);
         }
@@ -268,22 +217,20 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      */
     public function table_action($fk_ids, $news_id = '')
     {
-        if(!$this->is_admin) {
+        if (!$this->is_admin) {
             return;
         }
 
         $template = $this->getTemplate('_studycourses');
-        $template->test = explode('_', $fk_ids);
-        $template->bla = $fk_ids;
-        $template->studycourses = SimpleCollection::createFromArray(Studiengang::findBySQL('institut_id IN (:inst_ids) AND stat = :status ORDER BY abschluss_id, name',
-            [':inst_ids' => explode('_', $fk_ids), ':status' => 'genehmigt']));
+        $template->studycourses = SimpleCollection::createFromArray(
+            Studiengang::findBySQL(
+                'institut_id IN (:inst_ids) AND stat = :status ORDER BY abschluss_id, name',
+                [':inst_ids' => explode('_', $fk_ids), ':status' => 'genehmigt']
+            )
+        );
 
         $news = StudipNews::find($news_id);
-        if (!is_null($news)) {
-            $template->selected_study_courses = $news->news_ranges->pluck('range_id');
-        } else {
-            $template->selected_study_courses = [];
-        }
+        $template->selected_study_courses = $news ? $news->news_ranges->pluck('range_id') : [];
         $template->graduation_id = array_unique($template->studycourses->pluck('abschluss_id'));
         echo $template->render();
     }
@@ -303,10 +250,18 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $template->faculties = $this->faculties;
         $template->entry = new StudipNews($id);
 
-        $template->study_courses = SimpleCollection::createFromArray(Studiengang::findBySQL('studiengang_id IN (:ids) ORDER BY name',
-                [':ids' => $template->entry->news_ranges->pluck('range_id')]));
-        $template->all_study_courses = SimpleCollection::createFromArray(Studiengang::findBySQL('institut_id IN (:ids) ORDER BY name',
-                [':ids' => $template->study_courses->pluck('institut_id')]));
+        $template->study_courses = SimpleCollection::createFromArray(
+            Studiengang::findBySQL(
+                'studiengang_id IN (:ids) ORDER BY name',
+                [':ids' => $template->entry->news_ranges->pluck('range_id')]
+            )
+        );
+        $template->all_study_courses = SimpleCollection::createFromArray(
+            Studiengang::findBySQL(
+                'institut_id IN (:ids) ORDER BY name',
+                [':ids' => $template->study_courses->pluck('institut_id')]
+            )
+        );
 
         echo $template->render();
     }
@@ -331,7 +286,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      * Stores an entry.
      * @param null $id
      * @throws AccessDeniedException
-     * @throws InvalidMethodException
+     * @throws MethodNotAllowedException
      */
     public function store_action($id = null)
     {
@@ -340,31 +295,27 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         }
 
         if (!Request::isPost()) {
-            throw new InvalidMethodException();
+            throw new MethodNotAllowedException();
         }
 
         $institution_ids = Request::getArray('faculty_id');
         $studycourse_ids = Request::getArray('studycourse_ids');
 
-        if (empty($institution_ids) || empty($studycourse_ids)) {
+        if (!$institution_ids || !$studycourse_ids) {
             PageLayout::postError($this->_('Fehler beim Speichern der Ankündigung. Es wurde kein Studiengang ausgewählt.'));
         } else {
             $news = StudipNews::find($id);
-            if (is_null($news)) {
+            if (!$news) {
                 $news = new StudipNews();
                 $news->id = $news->getNewId();
-                $news->mkdate = time();
-            } else {
-                if (!$news->isNew() && $news->user_id != $GLOBALS['user']->id) {
-                    $news->chdate_uid = $GLOBALS['user']->id;
-                }
+            } elseif (!$news->isNew() && $news->user_id != User::findCurrent()->id) {
+                $news->chdate_uid = User::findCurrent()->id;
             }
             $news->topic = Request::get('subject');
-            $news->body = Request::get('content');
-            $news->user_id = $GLOBALS['user']->id;
-            $news->author = $GLOBALS['user']->getFullname();
-            $news->allow_comments = 0;
-            $news->chdate = time();
+            $news->body = Studip\Markup::purifyHtml(Request::get('content'));
+            $news->user_id = User::findCurrent()->id;
+            $news->author = User::findCurrent()->getFullname();
+            $news->allow_comments = false;
             $news->date = time();
             $news->expire = strtotime(Request::get('expires') . ' 23:59:59') - $news->date;
 
@@ -393,23 +344,21 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      */
     public function visit_action($news_id)
     {
-        object_set_visit($news_id, 'news', $GLOBALS['user']->id);
+        object_set_visit($news_id, 'news');
         object_add_view($news_id);
         echo object_return_views($news_id);
     }
 
     /**
      * Shows all currently visible news for a given study course.
-     * @param $abschluss_id
-     * @param $fach_id
      * @throws AccessDeniedException
      */
-    public function content_action($abschluss_id, $fach_id)
+    public function content_action()
     {
         if (!$this->is_root) {
             throw new AccessDeniedException;
         }
-        echo $this->getContent(new StudiengangsNews\StudyCourse([], [$abschluss_id], [$fach_id]));
+        echo $this->getContent();
     }
 
     /**
@@ -417,7 +366,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
      * @param bool $layout
      * @return mixed
      */
-    protected function getTemplate($template, $layout = false)
+    protected function getTemplate($template, bool $layout = false): Flexi_Template
     {
         if (Request::isXhr()) {
             header('Content-Type: text/html;charset=utf-8');
@@ -427,7 +376,9 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
         $factory  = new Flexi_TemplateFactory(__DIR__ . '/views');
         $template = $factory->open($template);
         $template->controller = $this;
-        $template->_          = function ($string) { return $this->_($string); };
+        $template->_ = function ($string) {
+            return $this->_($string);
+        };
         if ($layout && !Request::isXhr()) {
             $template->set_layout($GLOBALS['template_factory']->open('layouts/base.php'));
         }
@@ -445,10 +396,9 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     }
 
     /**
-     * @param $to
-     * @return mixed
+     * @param mixed $to
      */
-    public function url_for($to)
+    public function url_for($to): string
     {
         $arguments = func_get_args();
         $last = end($arguments);
@@ -464,21 +414,10 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
     }
 
     /**
-     * @param $to
-     * @return mixed
+     * @param mixed $to
      */
-    public function link_for($to)
+    public function link_for($to): string
     {
-        $arguments = func_get_args();
-        $last = end($arguments);
-        if (is_array($last)) {
-            $params = array_pop($arguments);
-        } else {
-            $params = [];
-        }
-
-        $path = implode('/', $arguments);
-
-        return PluginEngine::getLink($this, $params, $path);
+        return htmlReady($this->url_for(...func_get_args()));
     }
 }

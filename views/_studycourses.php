@@ -1,17 +1,17 @@
 <? if (count($studycourses) > 0) : ?>
 <section class="contentbox default">
-    <? foreach ($graduation_id as $id) : ?>
-        <? if (count($studycourses->findBy('abschluss_id', $id)) > 0 ) : ?>
-            <article class="contentbox" id="<?= $id?>">
-                <header>
-                    <h1>
-                        <a href="<?= ContentBoxHelper::href($id) ?>"
-                                title="<?= htmlReady($studycourses->findOneBy('abschluss_id', $id)->abschluss->name) ?>">
-                            <?= htmlReady($studycourses->findOneBy('abschluss_id', $id)->abschluss->name) ?>
-                        </a>
-                    </h1>
-                </header>
-            <section>
+<? foreach ($graduation_id as $id) : ?>
+    <? if (count($studycourses->findBy('abschluss_id', $id)) > 0 ) : ?>
+        <article class="contentbox" id="<?= htmlReady($id) ?>">
+            <header>
+                <h1>
+                    <a href="<?= ContentBoxHelper::href($id) ?>"
+                            title="<?= htmlReady($studycourses->findOneBy('abschluss_id', $id)->abschluss->name) ?>">
+                        <?= htmlReady($studycourses->findOneBy('abschluss_id', $id)->abschluss->name) ?>
+                    </a>
+                </h1>
+            </header>
+            <section class="contentbox">
                 <table class="default">
                     <thead>
                         <tr>
@@ -51,8 +51,8 @@
                 </table>
             </section>
         </article>
-        <? endif; ?>
-    <? endforeach; ?>
+    <? endif; ?>
+<? endforeach; ?>
 </section>
 <? else : ?>
     <div class="messagebox messagebox_info">

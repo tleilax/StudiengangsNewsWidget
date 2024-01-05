@@ -1,6 +1,6 @@
 <article class="studip">
 <? if ($is_admin) : ?>
-    <?= $this->render_partial('_admin_select.php', compact('is_admin', 'studiengaenge', 'id', 'controller', 'entries')) ?>
+    <?= $this->render_partial('_admin_select.php', compact('is_admin', 'studiengaenge', 'controller')) ?>
 <? endif; ?>
 
 <? if (!empty($news)) : ?>

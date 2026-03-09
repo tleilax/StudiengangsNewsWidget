@@ -13,7 +13,7 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         StudipAutoloader::addAutoloadPath($this->getPluginPath() . '/classes', 'StudiengangsNews');
 
-        $this->is_root = $GLOBALS['perm']->have_perm('root');
+        $this->is_root = User::findCurrent()->hasPermissionLevel('root');
         if ($this->is_root) {
             $faculties = Institute::findBySQL('Institut_id = fakultaets_id AND type = 7 ORDER BY Name');
         } else {
@@ -78,7 +78,8 @@ class StudiengangsNewsWidget extends StudIPPlugin implements PortalPlugin
 
         if ($this->is_admin) {
             $nav = new Navigation('', PluginEngine::getURL($this, [], 'edit'));
-            $nav->setImage(Icon::create('add') , tooltip2($this->_('Eintrag hinzufügen')) + ['data-dialog' => '']);
+            $nav->setImage(Icon::create('add') , tooltip2($this->_('Eintrag hinzufügen')));
+            $nav->setLinkAttributes(['data-dialog' => '']);
             $navigation[] = $nav;
         }
 
